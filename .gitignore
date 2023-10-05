@@ -41,6 +41,8 @@ lib_managed/
 src_managed/
 boot/
 .bsp/
+project/project
+.sbtopts
 
 # BNFC
 ###################
@@ -85,3 +87,4 @@ integration-tests.log
 .metals
 .history
 .vscode
+project/metals.sbt
