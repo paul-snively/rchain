@@ -11,6 +11,11 @@ Global / conflictManager := ConflictManager.strict
 //resolve all version conflicts explicitly
 Global / dependencyOverrides := Dependencies.overrides
 
+// monix-internal-jctools bizarrely hauls the scala.util package along with it
+ThisBuild / excludeDependencies ++= Seq(
+  ExclusionRule("io.monix", "monix-internal-jctools_2.12")
+)
+
 lazy val projectSettings = Seq(
   organization := "coop.rchain",
   scalaVersion := "2.12.15",
