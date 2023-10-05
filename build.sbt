@@ -206,6 +206,7 @@ lazy val comm = (project in file("comm"))
       catsCore,
       catsMtl,
       catsTagless,
+      jctools,
       monix,
       guava
     ),

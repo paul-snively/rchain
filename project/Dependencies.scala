@@ -51,6 +51,7 @@ object Dependencies {
   val http4sCirce         = "org.http4s"                 %% "http4s-circe"              % http4sVersion
   val http4sDSL           = "org.http4s"                 %% "http4s-dsl"                % http4sVersion
   val jaxb                = "javax.xml.bind"              % "jaxb-api"                  % "2.3.1"
+  val jctools             = "org.jctools"                 % "jctools-core"              % "3.3.0"
   val jline               = ("org.scala-lang"             % "jline"                     % "2.10.7")
     .exclude("org.fusesource.jansi", "jansi")
   val julToSlf4j          = "org.slf4j"                   % "jul-to-slf4j"              % slf4jVersion
