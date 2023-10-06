@@ -8,7 +8,7 @@ object Dependencies {
   val catsEffectVersion = "2.5.4"
   val catsMtlVersion    = "0.7.1"
   val fs2Version        = "2.5.10"
-  val monixVersion      = "3.4.0"
+  val monixVersion      = "3.4.1"
   val http4sVersion     = "0.21.24"
   val endpointsVersion  = "1.4.0"
   val circeVersion      = "0.13.0"
@@ -51,7 +51,6 @@ object Dependencies {
   val http4sCirce         = "org.http4s"                 %% "http4s-circe"              % http4sVersion
   val http4sDSL           = "org.http4s"                 %% "http4s-dsl"                % http4sVersion
   val jaxb                = "javax.xml.bind"              % "jaxb-api"                  % "2.3.1"
-  val jctools             = "org.jctools"                 % "jctools-core"              % "3.3.0"
   val jline               = ("org.scala-lang"             % "jline"                     % "2.10.7")
     .exclude("org.fusesource.jansi", "jansi")
   val julToSlf4j          = "org.slf4j"                   % "jul-to-slf4j"              % slf4jVersion
@@ -71,7 +70,7 @@ object Dependencies {
   val magnolia            = "com.propensive"             %% "magnolia"                  % "0.17.0"
   val mockito             = "org.mockito"                %% "mockito-scala-cats"        % "1.16.42" % "test"
   val monix               = "io.monix"                   %% "monix"                     % monixVersion
-  val monixTesting        = "io.monix"                   %% "monix-testing-scalatest"   % "0.3.0"
+  val monixTesting        = "io.monix"                   %% "monix-testing-scalatest"   % "0.4.0"
   val pureconfig          = "com.github.pureconfig"      %% "pureconfig"                % "0.14.0"
   val scalaLogging        = "com.typesafe.scala-logging" %% "scala-logging"             % "3.9.4"
   val scalaUri            = "io.lemonlabs"               %% "scala-uri"                 % "3.0.0"

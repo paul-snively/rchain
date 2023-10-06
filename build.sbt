@@ -7,14 +7,9 @@ import com.typesafe.sbt.packager.docker._
 Global / cancelable := true
 
 //disallow any unresolved version conflicts at all for faster feedback
-Global / conflictManager := ConflictManager.strict
+// Global / conflictManager := ConflictManager.strict
 //resolve all version conflicts explicitly
-Global / dependencyOverrides := Dependencies.overrides
-
-// monix-internal-jctools bizarrely hauls the scala.util package along with it
-ThisBuild / excludeDependencies ++= Seq(
-  ExclusionRule("io.monix", "monix-internal-jctools_2.12")
-)
+// Global / dependencyOverrides := Dependencies.overrides
 
 lazy val projectSettings = Seq(
   organization := "coop.rchain",
@@ -206,7 +201,6 @@ lazy val comm = (project in file("comm"))
       catsCore,
       catsMtl,
       catsTagless,
-      jctools,
       monix,
       guava
     ),
