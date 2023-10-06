@@ -285,6 +285,9 @@ lazy val node = (project in file("node"))
     assembly / mainClass := Some("coop.rchain.node.Main"),
     assembly / assemblyMergeStrategy := {
       case x if x.endsWith("io.netty.versions.properties") => MergeStrategy.first
+      case x if x.endsWith("scala/annotation/nowarn.class") => MergeStrategy.discard
+      case x if x.endsWith("scala/annotation/nowarn$.class") => MergeStrategy.discard
+      case x if x.endsWith("module-info.class") => MergeStrategy.discard
       case x =>
         val oldStrategy = (assembly / assemblyMergeStrategy).value
         oldStrategy(x)
