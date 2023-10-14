@@ -4,7 +4,6 @@ import cats._
 import cats.effect.Sync
 import cats.syntax.all._
 import cats.tagless._
-import coop.rchain.catscontrib.effect.implicits._
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
@@ -99,6 +98,4 @@ sealed abstract class LogInstances {
     def error(msg: => String, cause: Throwable)(implicit ev: LogSource): F[Unit] =
       Sync[F].delay(Logger(ev.clazz).error(msg, cause))
   }
-
-  val logId: Log[Id] = log
 }

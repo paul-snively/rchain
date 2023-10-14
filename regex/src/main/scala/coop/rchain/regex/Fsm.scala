@@ -51,6 +51,7 @@ object Fsm {
     * This is a pretty powerful procedure which could potentially go on
     * forever if you supply an evil version of follow().
     */
+  @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
   private[regex] def crawl[T](
       alphabet: Set[Char],
       initial: T,
@@ -181,6 +182,7 @@ object Fsm {
     // Take a state in the numbered FSM and return a set containing it, plus
     // (if it's final) the first state from the next FSM, plus (if that's
     // final) the first state from the next but one FSM, plus...
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
     def connectAll(fsmIdx: Int, subState: Int): Set[(Int, Int)] = {
       @tailrec
       def updateIndexes(
@@ -202,6 +204,7 @@ object Fsm {
 
     //if we're in a final state of the final FSM, it's final
     //key: Index, value: fsms(i).currentState
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
     def isFinal(statesSet: Set[(Int, Int)]): Boolean =
       statesSet.exists {
         case (fsmIndex, fsmState) =>
@@ -209,6 +212,7 @@ object Fsm {
             .contains(fsmState)
       }
 
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
     val initalStates = if (fsms.nonEmpty) {
       connectAll(0, fsms(0).initialState)
     } else {
@@ -218,6 +222,7 @@ object Fsm {
     // Follow the collection of states through all FSMs at once, jumping to the
     // next FSM if we reach the end of the current one
     // TODO: improve all follow() implementations to allow for dead metastates?
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
     def follow(currentStates: Set[(Int, Int)], currentSymbol: Char): Option[Set[(Int, Int)]] = {
       val nextStates = currentStates.flatMap {
         case (fsmIndex, fsmState) =>

@@ -13,7 +13,7 @@ Global / cancelable := true
 
 lazy val projectSettings = Seq(
   organization := "coop.rchain",
-  scalaVersion := "2.12.15",
+  scalaVersion := "2.12.18",
   version := "0.1.0-SNAPSHOT",
   resolvers ++=
     Resolver.sonatypeOssRepos("releases") ++
@@ -32,7 +32,7 @@ lazy val projectSettings = Seq(
     Wart.Nothing,
     Wart.Equals,
     Wart.PublicInference,
-    Wart.TraversableOps,
+    Wart.IterableOps,
     Wart.ArrayEquals,
     Wart.While,
     Wart.Any,
@@ -52,7 +52,6 @@ lazy val projectSettings = Seq(
     Wart.AnyVal
   ),
   scalafmtOnCompile := !sys.env.contains("CI"), // disable in CI environments
-  ThisBuild / scapegoatVersion := "1.4.11",
   Test / testOptions += Tests.Argument("-oD"), //output test durations
   javacOptions ++= Seq("-source", "11", "-target", "11"),
   Test / fork := true,
@@ -83,15 +82,6 @@ lazy val projectSettings = Seq(
 // a namespace for generative tests (or other tests that take a long time)
 lazy val SlowcookerTest = config("slowcooker") extend (Test)
 
-lazy val coverageSettings = Seq(
-  coverageMinimum := 90,
-  coverageFailOnMinimum := false,
-  coverageExcludedFiles := Seq(
-    (Compile / javaSource).value,
-    (Compile / sourceManaged).value.getPath ++ "/.*"
-  ).mkString(";")
-)
-
 lazy val compilerSettings = CompilerSettings.options ++ Seq(
   crossScalaVersions := Seq(scalaVersion.value)
 )
@@ -106,7 +96,7 @@ lazy val profilerSettings = Seq(
   reStart / javaOptions ++= (run / javaOptions).value
 )
 
-lazy val commonSettings = projectSettings ++ coverageSettings ++ compilerSettings ++ profilerSettings
+lazy val commonSettings = projectSettings ++ compilerSettings ++ profilerSettings
 
 lazy val sdk = (project in file("sdk"))
   .settings(commonSettings: _*)

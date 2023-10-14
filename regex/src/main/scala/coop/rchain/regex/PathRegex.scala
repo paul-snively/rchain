@@ -65,6 +65,7 @@ private[regex] final case class PathToken(
     *
     * @throws IllegalArgumentException if token couldn't be formatted
     */
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
   private[regex] def formatSegment(
       args: Map[String, Iterable[String]],
       encode: String => String

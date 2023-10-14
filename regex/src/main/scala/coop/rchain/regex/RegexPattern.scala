@@ -460,6 +460,7 @@ final case class CharClassPattern(charSet: Set[Char], negateCharSet: Boolean = f
 
   override def hashCode(): Int = if (negateCharSet) charSet.hashCode() else -charSet.hashCode()
 
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
   override def toString: String = {
     def isPrintable(c: Char): Boolean =
       ((c >= 32) && (c <= 127)) || (!Character.isISOControl(c) && {
@@ -692,7 +693,7 @@ object ConcPattern extends ParsedPattern {
   * e.g. abcde[{@literal ^}fg]*h{4}[a-z]+(subpattern)(subpattern2)
   * To express the empty string, use an empty ConcatenationPattern().
   */
-@SuppressWarnings(Array("org.wartremover.warts.Throw"))
+@SuppressWarnings(Array("org.wartremover.warts.Throw", "org.wartremover.warts.SizeIs"))
 final case class ConcPattern(mults: List[MultPattern]) extends RegexPattern {
 
   override lazy val alphabet: Set[Char] = mults.flatMap(_.alphabet).toSet + Fsm.anythingElse

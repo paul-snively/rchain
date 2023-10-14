@@ -10,6 +10,9 @@
 .worksheet/
 .tmpBin/
 
+# CMake output
+build
+
 # Maven Output #
 #################
 target
