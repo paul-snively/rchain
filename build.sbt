@@ -120,6 +120,7 @@ lazy val shared = (project in file("shared"))
       catsMtl,
       catsTagless,
       fs2Core,
+      log4cats,
       lz4,
       monix,
       scodecCore,
@@ -230,7 +231,7 @@ lazy val models = (project in file("models"))
       scalapbRuntimegGrpc
     ),
     Compile / PB.targets := Seq(
-      coop.rchain.scalapb.gen(flatPackage = true, grpc = false) -> (Compile / sourceManaged).value,
+      scalapb.gen(flatPackage = true, grpc = false) -> (Compile / sourceManaged).value,
       grpcmonix.generators.gen()                                -> (Compile / sourceManaged).value
     )
   )

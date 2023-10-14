@@ -8,6 +8,9 @@ import cats.tagless._
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.Logger
+
 trait LogSource {
   val clazz: Class[_]
 }
@@ -35,7 +38,6 @@ class LogSourceMacros(val c: blackbox.Context) {
 }
 
 trait Log[F[_]] {
-  def isTraceEnabled(implicit ev: LogSource): F[Boolean]
   def trace(msg: => String)(implicit ev: LogSource): F[Unit]
   def debug(msg: => String)(implicit ev: LogSource): F[Unit]
   def info(msg: => String)(implicit ev: LogSource): F[Unit]
@@ -49,7 +51,6 @@ object Log extends LogInstances {
   def apply[F[_]](implicit L: Log[F]): Log[F] = L
 
   class NOPLog[F[_]: Applicative] extends Log[F] {
-    def isTraceEnabled(implicit ev: LogSource): F[Boolean]                       = false.pure[F]
     def trace(msg: => String)(implicit ev: LogSource): F[Unit]                   = ().pure[F]
     def debug(msg: => String)(implicit ev: LogSource): F[Unit]                   = ().pure[F]
     def info(msg: => String)(implicit ev: LogSource): F[Unit]                    = ().pure[F]
@@ -62,7 +63,6 @@ object Log extends LogInstances {
   // FunctorK
   implicit class LogMapKOps[F[_]](val log: Log[F]) extends AnyVal {
     def mapK[G[_]](nt: F ~> G): Log[G] = new Log[G] {
-      override def isTraceEnabled(implicit ev: LogSource): G[Boolean]     = nt(log.isTraceEnabled)
       override def trace(msg: => String)(implicit ev: LogSource): G[Unit] = nt(log.trace(msg))
       override def debug(msg: => String)(implicit ev: LogSource): G[Unit] = nt(log.debug(msg))
       override def info(msg: => String)(implicit ev: LogSource): G[Unit]  = nt(log.info(msg))
@@ -78,24 +78,22 @@ object Log extends LogInstances {
 
 sealed abstract class LogInstances {
 
-  def log[F[_]: Sync]: Log[F] = new Log[F] {
-    import com.typesafe.scalalogging.Logger
+  def log[F[_]: Sync](implicit ev: LogSource): Log[F] = new Log[F] {
+    val logger: Logger[F] = Slf4jLogger.getLoggerFromClass(ev.clazz)
 
-    def isTraceEnabled(implicit ev: LogSource): F[Boolean] =
-      Sync[F].delay(Logger(ev.clazz).underlying.isTraceEnabled())
     def trace(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(Logger(ev.clazz).trace(msg))
+      Sync[F].delay(logger.trace(msg))
     def debug(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(Logger(ev.clazz).debug(msg))
+      Sync[F].delay(logger.debug(msg))
     def info(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(Logger(ev.clazz).info(msg))
+      Sync[F].delay(logger.info(msg))
     def warn(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(Logger(ev.clazz).warn(msg))
+      Sync[F].delay(logger.warn(msg))
     def warn(msg: => String, cause: Throwable)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(Logger(ev.clazz).warn(msg, cause))
+      Sync[F].delay(logger.warn(cause)(msg))
     def error(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(Logger(ev.clazz).error(msg))
+      Sync[F].delay(logger.error(msg))
     def error(msg: => String, cause: Throwable)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(Logger(ev.clazz).error(msg, cause))
+      Sync[F].delay(logger.error(cause)(msg))
   }
 }

@@ -15,6 +15,8 @@ object Dependencies {
   val enumeratumVersion = "1.5.13"
   val slf4jVersion      = "1.7.30"
   val kamonVersion      = "1.1.6"
+  val log4catsVersion   = "1.7.0"
+  val fs2GrpcVersion    = "2.7.9"
 
   // format: off
   val bouncyProvCastle    = "org.bouncycastle"            % "bcprov-jdk15on"            % "1.68"
@@ -59,11 +61,12 @@ object Dependencies {
   val kamonCore           = "io.kamon"                   %% "kamon-core"                % kamonVersion
   val kamonSystemMetrics  = "io.kamon"                   %% "kamon-system-metrics"      % "1.0.1"
   val kamonPrometheus     = "io.kamon"                   %% "kamon-prometheus"          % "1.1.2"
-  val kamonInfluxDb       = "io.kamon"                   %% "kamon-influxdb"            % "1.0.2"
+  val kamonInfluxDb       = "io.kamon"                    %% "kamon-influxdb"            % "1.0.2"
   val kamonZipkin         = "io.kamon"                   %% "kamon-zipkin"              % "1.0.0"
   val lightningj          = ("org.lightningj"             % "lightningj"                % "0.5.2-Beta")
     .intransitive() //we only use the lib for one util class (org.lightningj.util.ZBase32) that has no dependencies
   val lmdbjava            = "org.lmdbjava"                % "lmdbjava"                  % "0.8.2"
+  val log4cats            = "org.typelevel"              %% "log4cats-slf4j"            % log4catsVersion
   val logbackClassic      = "ch.qos.logback"              % "logback-classic"           % "1.2.3"
   val logstashLogback     = "net.logstash.logback"        % "logstash-logback-encoder"  % "6.6"
   val lz4                 = "org.lz4"                     % "lz4-java"                  % "1.7.1"
@@ -126,7 +129,7 @@ object Dependencies {
     // Overrides for transitive dependencies (we don't use them directly, hence no val-s)
     "com.github.jnr"         % "jnr-ffi"     % "2.2.12",
     "com.lihaoyi"            %% "geny"       % "0.6.10",
-    "com.lihaoyi"            %% "sourcecode" % "0.2.1",
+    "com.lihaoyi"            %% "sourcecode" % "0.3.1",
     "org.scala-lang.modules" %% "scala-xml"  % "1.3.0",
     "com.typesafe"           % "config"      % "1.4.0"
   )

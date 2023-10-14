@@ -18,9 +18,11 @@ import monix.reactive.subjects.PublishSubject
 import org.reactivestreams.{Subscriber => SubscriberR}
 import scalapb.grpc.Grpc
 
+import org.slf4j.LoggerFactory
+
 object GrpcMonix {
 
-  private val logger                        = Log.logId
+  private val logger                        = LoggerFactory.getLogger(logSource.clazz)
   implicit private val logSource: LogSource = LogSource(this.getClass)
 
   type GrpcOperator[I, O] = StreamObserver[O] => StreamObserver[I]
