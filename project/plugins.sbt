@@ -1,3 +1,4 @@
+addSbtPlugin("org.typelevel" % "sbt-fs2-grpc" % "2.7.9")
 addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.6")
 
 addSbtPlugin("org.wartremover"        %  "sbt-wartremover"      % "3.1.4")

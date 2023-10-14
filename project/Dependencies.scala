@@ -129,7 +129,7 @@ object Dependencies {
     // Overrides for transitive dependencies (we don't use them directly, hence no val-s)
     "com.github.jnr"         % "jnr-ffi"     % "2.2.12",
     "com.lihaoyi"            %% "geny"       % "0.6.10",
-    "com.lihaoyi"            %% "sourcecode" % "0.3.1",
+    "com.lihaoyi"            %% "sourcecode" % "0.2.1",
     "org.scala-lang.modules" %% "scala-xml"  % "1.3.0",
     "com.typesafe"           % "config"      % "1.4.0"
   )
