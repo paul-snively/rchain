@@ -35,6 +35,7 @@ final case class DagRepresentation(
   lazy val latestBlockNumber: Long = heightMap.lastOption.map { case (h, _) => h + 1 }.getOrElse(0L)
 
   // TODO: pick highest block from fringe until LFB is replaced with fringe completely
+  @SuppressWarnings(Array("org.wartremover.warts.SortedMaxMinOption"))
   lazy val lastFinalizedBlockHash: Option[BlockHash] =
     latestFringe.toList.sortBy(_.height).lastOption.map(_.id)
 

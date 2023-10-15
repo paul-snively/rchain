@@ -143,6 +143,7 @@ object Blake2b512Random {
 
   def defaultRandom: Blake2b512Random = Blake2b512Random(128)
 
+  @SuppressWarnings(Array("org.wartremover.warts.SeqApply", "org.wartremover.warts.SizeIs"))
   def merge(children: Seq[Blake2b512Random]): Blake2b512Random = {
     @tailrec
     def internalMerge(children: Vector[Blake2b512Random]): Blake2b512Random = {

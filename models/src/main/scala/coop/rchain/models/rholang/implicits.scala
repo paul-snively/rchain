@@ -342,6 +342,7 @@ object implicits {
         None
       }
 
+    @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
     def singleConnective(): Option[Connective] =
       if (p.sends.isEmpty && p.receives.isEmpty && p.news.isEmpty && p.exprs.isEmpty && p.matches.isEmpty && p.bundles.isEmpty && p.connectives.size == 1) {
         Some(p.connectives.head)

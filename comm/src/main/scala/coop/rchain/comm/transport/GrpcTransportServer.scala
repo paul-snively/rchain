@@ -39,6 +39,7 @@ object TransportLayerServer {
     }
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
 class GrpcTransportServer[F[_]: Monixable: Concurrent: RPConfAsk: Log: Metrics](
     networkId: String,
     port: Int,
@@ -107,6 +108,7 @@ class GrpcTransportServer[F[_]: Monixable: Concurrent: RPConfAsk: Log: Metrics](
   }
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
 object GrpcTransportServer {
 
   def acquireServer[F[_]: Monixable: Concurrent: RPConfAsk: Log: Metrics](

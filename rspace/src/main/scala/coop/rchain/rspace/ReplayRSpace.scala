@@ -271,6 +271,7 @@ class ReplayRSpace[F[_]: Concurrent: ContextShift: Log: Metrics: Span, C, P, A, 
       _ <- produceCounter.update(_.putAndIncrementCounter(produceRef)).whenA(!persist)
     } yield produceRef
 
+  @SuppressWarnings(Array("org.wartremover.warts.ListUnapply"))
   private[this] def getCommOrCandidate[Candidate](
       comms: Seq[COMM],
       runMatcher: COMM => F[Option[Candidate]]

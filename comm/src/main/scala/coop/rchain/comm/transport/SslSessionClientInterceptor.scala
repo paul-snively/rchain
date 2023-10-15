@@ -25,8 +25,10 @@ class SslSessionClientCallInterceptor[ReqT, RespT](next: ClientCall[ReqT, RespT]
     extends ClientCall[ReqT, RespT] {
   self =>
 
+  /*
   implicit private val logSource: LogSource = LogSource(this.getClass)
   private val log                           = Log.logId
+   */
 
   def cancel(message: String, cause: Throwable): Unit = next.cancel(message, cause)
   def request(numMessages: Int): Unit                 = next.request(numMessages)
@@ -59,7 +61,7 @@ class SslSessionClientCallInterceptor[ReqT, RespT](next: ClientCall[ReqT, RespT]
               self.getAttributes.get(Grpc.TRANSPORT_ATTR_SSL_SESSION)
             )
             if (sslSession.isEmpty) {
-              log.warn("No TLS Session. Closing connection")
+//              log.warn("No TLS Session. Closing connection")
               close(Status.UNAUTHENTICATED.withDescription("No TLS Session"))
             } else {
               sslSession.foreach { session =>
@@ -69,14 +71,14 @@ class SslSessionClientCallInterceptor[ReqT, RespT](next: ClientCall[ReqT, RespT]
                 if (verified)
                   next.onMessage(message)
                 else {
-                  log.warn("Certificate verification failed. Closing connection")
+//                  log.warn("Certificate verification failed. Closing connection")
                   close(Status.UNAUTHENTICATED.withDescription("Certificate verification failed"))
                 }
               }
             }
           } else {
             val nidStr = if (nid.isEmpty) "<empty>" else nid
-            log.warn(s"Wrong network id '$nidStr'. Closing connection")
+//            log.warn(s"Wrong network id '$nidStr'. Closing connection")
             close(Status.PERMISSION_DENIED.withDescription(s"Wrong network id '$nidStr'"))
           }
 
@@ -84,7 +86,7 @@ class SslSessionClientCallInterceptor[ReqT, RespT](next: ClientCall[ReqT, RespT]
           next.onMessage(message)
 
         case TLResponse(_) =>
-          log.warn(s"Malformed response $message")
+//          log.warn(s"Malformed response $message")
           close(Status.INVALID_ARGUMENT.withDescription("Malformed message"))
         case _ => next.onMessage(message)
       }

@@ -132,7 +132,8 @@ lazy val shared = (project in file("shared"))
       catsLawsTest,
       catsLawsTestkitTest,
       enumeratum,
-      jaxb
+      jaxb,
+      sourcecode
     )
   )
   .dependsOn(sdk)
@@ -200,13 +201,23 @@ lazy val comm = (project in file("comm"))
       grpcmonix.generators.gen() -> (Compile / sourceManaged).value
     )
   )
-  .dependsOn(shared % "compile->compile;test->test", crypto, models)
+  .dependsOn(
+    shared % "compile->compile;test->test",
+    crypto,
+    models
+  )
 
 lazy val crypto = (project in file("crypto"))
   .settings(commonSettings: _*)
   .settings(
     name := "crypto",
+    // Believe it or not, bitcoin-s is built for Scala 2.12 at version 1.9.3, and 2.13 at version 1.9.7.
+    bitcoinSVersion := (CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, n)) if n == 12 => "1.9.3"
+      case Some((2, n)) if n == 13 => "1.9.7"
+    }),
     libraryDependencies ++= commonDependencies ++ protobufLibDependencies ++ Seq(
+      bitcoinS % bitcoinSVersion.value,
       guava,
       bouncyPkixCastle,
       bouncyProvCastle,
@@ -386,7 +397,12 @@ lazy val node = (project in file("node"))
       "openssl"
     )
   )
-  .dependsOn(casper % "compile->compile;test->test", comm, crypto, rholang)
+  .dependsOn(
+    casper % "compile->compile;test->test",
+    comm,
+    crypto,
+    rholang
+  )
 
 lazy val regex = (project in file("regex"))
   .settings(commonSettings: _*)
@@ -475,7 +491,8 @@ lazy val rspace = (project in file("rspace"))
       catsCore,
       fs2Core,
       scodecCore,
-      scodecBits
+      scodecBits,
+      scrypto
     ),
     /* Tutorial */
     /* Publishing Settings */
@@ -498,7 +515,10 @@ lazy val rspace = (project in file("rspace"))
     licenses := Seq("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0")),
     homepage := Some(url("https://www.rchain.coop"))
   )
-  .dependsOn(shared % "compile->compile;test->test", crypto)
+  .dependsOn(
+    shared % "compile->compile;test->test",
+    crypto
+  )
 
 lazy val rspaceBench = (project in file("rspace-bench"))
   .settings(

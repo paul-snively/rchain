@@ -388,6 +388,7 @@ abstract class RSpaceOps[F[_]: Concurrent: ContextShift: Log: Metrics: Span, C, 
         }
       }
 
+  @SuppressWarnings(Array("org.wartremover.warts.ListUnapply"))
   protected[this] def runMatcherForChannels(
       groupedChannels: Seq[CandidateChannels],
       fetchMatchingContinuations: (CandidateChannels) => F[Seq[(WaitingContinuation[P, K], Int)]],

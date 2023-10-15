@@ -20,9 +20,10 @@ class SslSessionServerInterceptor(networkID: String) extends ServerInterceptor {
       next: ServerCallHandler[ReqT, RespT]
   ): ServerCall.Listener[ReqT] = new InterceptionListener(next.startCall(call, headers), call)
 
+  /*
   implicit private val logSource: LogSource = LogSource(this.getClass)
   private val log                           = Log.logId
-
+   */
   private class InterceptionListener[ReqT, RespT](
       next: ServerCall.Listener[ReqT],
       call: ServerCall[ReqT, RespT]
@@ -40,18 +41,20 @@ class SslSessionServerInterceptor(networkID: String) extends ServerInterceptor {
 
     override def onMessage(message: ReqT): Unit =
       message match {
-        case TLRequest(Protocol(RHeader(sender, nid), msg)) =>
+        case TLRequest(Protocol(RHeader(sender, nid), msg @ _)) =>
           if (nid == networkID) {
+            /*
             if (log.isTraceEnabled) {
               val peerNode = ProtocolHelper.toPeerNode(sender)
               val msgType  = msg.getClass.toString
               log.trace(s"Request [$msgType] from peer ${peerNode.toAddress}")
             }
+             */
             val sslSession: Option[SSLSession] = Option(
               call.getAttributes.get(Grpc.TRANSPORT_ATTR_SSL_SESSION)
             )
             if (sslSession.isEmpty) {
-              log.warn("No TLS Session. Closing connection")
+//              log.warn("No TLS Session. Closing connection")
               close(Status.UNAUTHENTICATED.withDescription("No TLS Session"))
             } else {
               sslSession.foreach { session =>
@@ -61,14 +64,14 @@ class SslSessionServerInterceptor(networkID: String) extends ServerInterceptor {
                 if (verified)
                   next.onMessage(message)
                 else {
-                  log.warn("Certificate verification failed. Closing connection")
+//                  log.warn("Certificate verification failed. Closing connection")
                   close(Status.UNAUTHENTICATED.withDescription("Certificate verification failed"))
                 }
               }
             }
           } else {
             val nidStr = if (nid.isEmpty) "<empty>" else nid
-            log.warn(s"Wrong network id '$nidStr'. Closing connection")
+//            log.warn(s"Wrong network id '$nidStr'. Closing connection")
             close(
               Status.PERMISSION_DENIED
                 .withDescription(
@@ -77,7 +80,7 @@ class SslSessionServerInterceptor(networkID: String) extends ServerInterceptor {
             )
           }
         case TLRequest(_) =>
-          log.warn(s"Malformed message $message")
+//          log.warn(s"Malformed message $message")
           close(Status.INVALID_ARGUMENT.withDescription("Malformed message"))
         case _ => next.onMessage(message)
       }

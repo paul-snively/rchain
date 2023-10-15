@@ -70,6 +70,7 @@ object Graphz {
     case Record        => "record"
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
   def smallToString[A]: Show[A] = Show.show(_.toString.toLowerCase)
 
   implicit val showStyle: Show[GraphStyle]     = smallToString[GraphStyle]

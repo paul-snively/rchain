@@ -23,7 +23,7 @@ import monix.execution.{Cancelable, CancelableFuture, Scheduler}
 
 import java.io.ByteArrayInputStream
 import scala.collection.concurrent.TrieMap
-import scala.concurrent.duration.{FiniteDuration, _}
+import scala.concurrent.duration._
 import scala.util._
 
 /**
@@ -37,6 +37,7 @@ final case class BufferedGrpcStreamChannel[F[_]](
     buferSubscriber: Cancelable
 )
 
+@SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
 class GrpcTransportClient[F[_]: Monixable: Concurrent: Log: Metrics](
     networkId: String,
     cert: String,

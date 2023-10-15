@@ -8,6 +8,7 @@ import cats.syntax.all._
 
 import coop.rchain.comm._
 
+@SuppressWarnings(Array("org.wartremover.warts.SeqApply", "org.wartremover.warts.SizeIs"))
 object KademliaNodeDiscovery {
 
   /**

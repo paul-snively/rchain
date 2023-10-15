@@ -16,6 +16,7 @@ trait SignaturesAlg {
 }
 
 object SignaturesAlg {
+  @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
   def apply(algorithm: String): Option[SignaturesAlg] =
     algorithm.toLowerCase match {
       // ed25519 signature algorithm is disabled

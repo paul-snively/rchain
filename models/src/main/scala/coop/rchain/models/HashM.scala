@@ -26,6 +26,7 @@ trait HashM[A] {
   def hash[F[_]: Sync](value: A): F[Int]
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
 object HashM extends HashMDerivation {
 
   def apply[A](implicit ev: HashM[A]): HashM[A] = ev
@@ -180,6 +181,7 @@ object HashM extends HashMDerivation {
   implicit val LastFinalizedBlockResponseV2Hash = gen[v1.LastFinalizedBlockResponse]
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
 trait HashMDerivation {
   import magnolia._
 

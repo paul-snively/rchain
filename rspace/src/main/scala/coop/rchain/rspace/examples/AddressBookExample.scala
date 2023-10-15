@@ -5,7 +5,7 @@ import cats.{Applicative, Id}
 import coop.rchain.metrics.{Metrics, NoopSpan, Span}
 import coop.rchain.rspace.syntax.rspaceSyntaxKeyValueStoreManager
 import coop.rchain.rspace.util.{runKs, unpackOption, unpackSeq}
-import coop.rchain.rspace.{RSpace, _}
+import coop.rchain.rspace._
 import coop.rchain.shared.Language.ignore
 import coop.rchain.shared.{Log, Serialize}
 import coop.rchain.store.InMemoryStoreManager
@@ -80,14 +80,6 @@ object AddressBookExample {
   }
 
   object implicits {
-
-    implicit val concurrentF: Concurrent[Id] = coop.rchain.catscontrib.effect.implicits.concurrentId
-
-    implicit val contextShiftId: ContextShift[Id] =
-      new ContextShift[Id] {
-        def shift: Id[Unit]                                   = ???
-        def evalOn[A](ec: ExecutionContext)(fa: Id[A]): Id[A] = fa
-      }
 
     /* Now I will troll Greg... */
 
@@ -193,145 +185,4 @@ object AddressBookExample {
     email = "carol@blablah.org",
     phone = "232-555-1212"
   )
-
-  def exampleOne(): Unit = {
-
-    implicit val log: Log[Id]          = Log.log
-    implicit val metricsF: Metrics[Id] = new Metrics.MetricsNOP[Id]()
-    implicit val spanF: Span[Id]       = NoopSpan[Id]()
-    implicit val keyValueStoreManager  = InMemoryStoreManager[Id]
-
-    // Let's define our store
-    val store = keyValueStoreManager.rSpaceStores
-    val space = RSpace.create[Id, Channel, Pattern, Entry, Printer](store)
-
-    Console.printf("\nExample One: Let's consume and then produce...\n")
-
-    val cres =
-      space
-        .consume(
-          Seq(Channel("friends")),
-          Seq(CityMatch(city = "Crystal Lake")),
-          new Printer,
-          persist = true
-        ) // it should be fine to do that -- type of left side is Nothing (no invalid states)
-
-    assert(cres.isEmpty)
-
-    val pres1 = space.produce(Channel("friends"), alice, persist = false)
-    val pres2 = space.produce(Channel("friends"), bob, persist = false)
-    val pres3 = space.produce(Channel("friends"), carol, persist = false)
-
-    assert(pres1.nonEmpty)
-    assert(pres2.nonEmpty)
-    assert(pres3.isEmpty)
-
-    runKs(unpackSeq(Seq(pres1, pres2)))
-  }
-
-  def exampleTwo(): Unit = {
-
-    implicit val log: Log[Id]          = Log.log
-    implicit val metricsF: Metrics[Id] = new Metrics.MetricsNOP[Id]()
-    implicit val spanF: Span[Id]       = NoopSpan[Id]()
-    implicit val keyValueStoreManager  = InMemoryStoreManager[Id]
-
-    // Let's define our store
-    val store = keyValueStoreManager.rSpaceStores
-    val space = RSpace.create[Id, Channel, Pattern, Entry, Printer](store)
-
-    Console.printf("\nExample Two: Let's produce and then consume...\n")
-
-    val pres1 = space.produce(Channel("friends"), alice, persist = false)
-    val pres2 = space.produce(Channel("friends"), bob, persist = false)
-    val pres3 = space.produce(Channel("friends"), carol, persist = false)
-
-    assert(pres1.isEmpty)
-    assert(pres2.isEmpty)
-    assert(pres3.isEmpty)
-
-    val consumer = () =>
-      space
-        .consume(
-          Seq(Channel("friends")),
-          Seq(NameMatch(last = "Lahblah")),
-          new Printer,
-          persist = false
-        )
-
-    val cres1 = consumer()
-    val cres2 = consumer()
-    val cres3 = consumer()
-
-    assert(cres1.isDefined)
-    assert(cres2.isDefined)
-    assert(cres3.isEmpty)
-
-    runKs(unpackSeq(Seq(cres1, cres2)))
-
-    Console.printf(space.toMap.toString())
-  }
-
-  def rollbackExample(): Unit = withSpace { space =>
-    println("Rollback example: Let's consume...")
-
-    val cres =
-      space
-        .consume(
-          Seq(Channel("friends")),
-          Seq(CityMatch(city = "Crystal Lake")),
-          new Printer,
-          persist = false
-        )
-
-    assert(cres.isEmpty)
-
-    println("Rollback example: And create a checkpoint...")
-    val checkpointHash = space.createCheckpoint().root
-
-    def produceAlice(): Option[(Printer, Seq[Entry])] =
-      unpackOption(space.produce(Channel("friends"), alice, persist = false))
-
-    println("Rollback example: First produce result should return some data")
-    assert(produceAlice.isDefined)
-
-    println("Rollback example: Second produce result should be empty")
-    assert(produceAlice.isEmpty)
-
-    println("Rollback example: Every following produce result should be empty")
-    assert(produceAlice.isEmpty)
-
-    println(
-      "Rollback example: Let's reset RSpace to the state from before running the produce operations"
-    )
-    space.reset(checkpointHash)
-
-    println("Rollback example: Again, first produce result should return some data")
-    assert(produceAlice.isDefined)
-
-    println("Rollback example: And again second produce result should be empty")
-    assert(produceAlice.isEmpty)
-
-  }
-
-  private[this] def withSpace(
-      f: ISpace[Id, Channel, Pattern, Entry, Printer] => Unit
-  ) = {
-
-    implicit val log: Log[Id]          = Log.log
-    implicit val metricsF: Metrics[Id] = new Metrics.MetricsNOP[Id]()
-    implicit val spanF: Span[Id]       = NoopSpan[Id]()
-    implicit val keyValueStoreManager  = InMemoryStoreManager[Id]
-
-    // Let's define our store
-    val store = keyValueStoreManager.rSpaceStores
-    val space = RSpace.create[Id, Channel, Pattern, Entry, Printer](store)
-    try {
-      f(space)
-    } finally {
-      ()
-    }
-
-  }
-
 }

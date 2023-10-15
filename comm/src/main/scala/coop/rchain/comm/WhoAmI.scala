@@ -61,7 +61,8 @@ object WhoAmI {
   private def checkFrom[F[_]: Sync](from: String): F[Option[String]] =
     Sync[F].delay {
       Try {
-        val whatismyip         = new URL(from)
+        import java.net.URI
+        val whatismyip         = new URI(from).toURL()
         val in: BufferedReader = new BufferedReader(new InputStreamReader(whatismyip.openStream()))
         InetAddress.getByName(in.readLine()).getHostAddress
       }.toOption

@@ -61,6 +61,7 @@ final case class Finalizer[M, S](msgMap: Map[M, Message[M, S]]) {
   /**
     * Checks if minimum messages are enough for next fringe calculation
     */
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
   def checkMinMessages(minMsgs: List[Message[M, S]], bondsMap: Map[S, Long]): Boolean =
     // TODO: add support for epoch changes, simple comparison for senders count is not enough
     minMsgs.size == bondsMap.size

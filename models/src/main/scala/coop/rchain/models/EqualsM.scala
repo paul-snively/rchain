@@ -32,6 +32,7 @@ trait EqualM[A] {
 
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
 object EqualM extends EqualMDerivation {
 
   def apply[A](implicit ev: EqualM[A]): EqualM[A] = ev
@@ -71,6 +72,7 @@ object EqualM extends EqualMDerivation {
 
   implicit def seqEqual[A: EqualM]: EqualM[Seq[A]] = new EqualM[Seq[A]] {
 
+    @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
     override def equal[F[_]: Sync](self: Seq[A], other: Seq[A]): F[Boolean] = {
       val pairs = self.toStream.zip(other)
       Sync[F].delay(self.length == other.length) &&^
@@ -91,6 +93,7 @@ object EqualM extends EqualMDerivation {
 
   implicit def mapEqual[A: EqualM, B: EqualM]: EqualM[Map[A, B]] = new EqualM[Map[A, B]] {
 
+    @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
     override def equal[F[_]: Sync](self: Map[A, B], other: Map[A, B]): F[Boolean] = {
       val pairsA = self.keys.toStream.zip(other.keys)
       val pairsB = self.values.toStream.zip(other.values)

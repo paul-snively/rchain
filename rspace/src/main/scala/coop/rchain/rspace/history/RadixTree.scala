@@ -122,6 +122,7 @@ object RadixTree {
 
       // Serialization (fill allocated memory)
       @tailrec
+      @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
       def putItemIntoArray(idxItem: Int, pos0: Int): Array[Byte] =
         if (pos0 == calcSize) arr // Happy end (return serializing data).
         else {
@@ -174,6 +175,7 @@ object RadixTree {
       def isLeaf(secondByte: Byte) = (secondByte & 0x80) == 0x00
 
       @tailrec
+      @SuppressWarnings(Array("org.wartremover.warts.SeqApply", "org.wartremover.warts.SeqUpdated"))
       // Each loop decodes one non-empty item.
       def decodeItem(pos0: Int, node: Node): Node =
         if (pos0 == maxSize) node // End of deserialization
@@ -302,6 +304,7 @@ object RadixTree {
     /**
       * Create path from root to lastPrefix node
       */
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
     def initNodePath(p: NodePathData): F[Either[NodePathData, Path]] = {
       def processChildItem(node: Node) = {
         val itemIdx = byteToInt(p.restPrefix.head)
@@ -347,6 +350,7 @@ object RadixTree {
       * @return [[Some]](idxItem, [[Item]]) if item found, [[None]] if non-empty item not found
       */
     @tailrec
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
     def findNextNonEmptyItem(node: Node, lastIdxOpt: Option[Byte]): Option[(Byte, Item)] =
       if (lastIdxOpt == 0xFF.toByte.some) none
       else {
@@ -660,6 +664,7 @@ object RadixTree {
     /**
       * Read leaf data with prefix. If data not found, returned [[None]]
       */
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
     final def read(startNode: Node, startPrefix: KeySegment): F[Option[Blake2b256Hash]] = {
       type Params = (Node, KeySegment)
       def loop(params: Params): F[Either[Params, Option[Blake2b256Hash]]] =
@@ -684,6 +689,7 @@ object RadixTree {
       (startNode, startPrefix).tailRecM(loop)
     }
 
+    @SuppressWarnings(Array("org.wartremover.warts.SeqUpdated"))
     private def createNodeFromItem(item: Item): Node =
       item match {
         case EmptyItem => emptyNode
@@ -749,6 +755,7 @@ object RadixTree {
       * If exist leaf with same prefix and same value - return [[None]].
       * @return Updated current item.
       */
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply", "org.wartremover.warts.SeqUpdated"))
     def update(
         curItem: Item,
         insPrefix: KeySegment,
@@ -817,6 +824,7 @@ object RadixTree {
       * If not found leaf with  delPrefix - return [[None]].
       * @return Updated current item.
       */
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply", "org.wartremover.warts.SeqUpdated"))
     def delete(curItem: Item, delPrefix: KeySegment): F[Option[Item]] = {
       def deleteFromChildNode(
           childPtr: Blake2b256Hash,
@@ -857,6 +865,13 @@ object RadixTree {
       * New data load to [[cacheW]].
       * @return Updated curNode. if no action was taken - return [[None]].
       */
+    @SuppressWarnings(
+      Array(
+        "org.wartremover.warts.SizeIs",
+        "org.wartremover.warts.SeqApply",
+        "org.wartremover.warts.SeqUpdated"
+      )
+    )
     def makeActions(curNode: Node, actions: List[HistoryAction]): F[Option[Node]] = {
 
       // If we have 1 action in group.
@@ -962,15 +977,18 @@ object RadixTree {
         noPrintFlag: Boolean
     ): F[Vector[String]] = {
 
+      @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
       def constructIdxStr(idx: Int): String = {
         val firstSymbol  = ((idx >> 4).toByte & 0xF).toHexString
         val secondSymbol = (idx.toByte & 0xF).toHexString
         (firstSymbol ++ secondSymbol).toUpperCase()
       }
 
+      @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
       def constructPrefixStr(prefix: KeySegment): String =
         if (prefix.isEmpty) "empty" else prefix.toHex.toUpperCase
 
+      @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
       def constructLeafValueStr(leafValue: Blake2b256Hash) =
         (leafValue.bytes.toHex.take(4) ++ "..." ++ leafValue.bytes.toHex.takeRight(4)).toUpperCase
 
@@ -1018,9 +1036,10 @@ object RadixTree {
           res = itemVectors.foldLeft(Vector[String]())(_ ++ _)
         } yield res
 
+      @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
       def constructFirstStr(treeName: String) = treeName.toUpperCase() + ": root =>"
 
-      def printStrings(strings: Vector[String]) = strings.map(println(_))
+      def printStrings(strings: Vector[String]) = strings.foreach(println(_))
 
       for {
         strings     <- print(rootNode, 1)

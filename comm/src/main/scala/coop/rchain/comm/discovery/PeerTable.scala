@@ -78,7 +78,13 @@ object PeerTable {
   * network discovery and routing protocol.
   *
   */
-@SuppressWarnings(Array("org.wartremover.warts.NonUnitStatements"))
+@SuppressWarnings(
+  Array(
+    "org.wartremover.warts.NonUnitStatements",
+    "org.wartremover.warts.SeqApply",
+    "org.wartremover.warts.SizeIs"
+  )
+)
 final class PeerTable[A <: PeerNode, F[_]: Sync: KademliaRPC](
     localKey: Seq[Byte],
     private[discovery] val k: Int,

@@ -163,6 +163,7 @@ object ScodecSerialize {
   private val codecProduce: Codec[Produce] =
     (Codec[Blake2b256Hash] :: Codec[Blake2b256Hash] :: bool).as[Produce]
 
+  @SuppressWarnings(Array("org.wartremover.warts.CaseClassPrivateApply"))
   private val codecConsume: Codec[Consume] =
     (codecSeq[Blake2b256Hash] :: Codec[Blake2b256Hash] :: bool).as[Consume]
 

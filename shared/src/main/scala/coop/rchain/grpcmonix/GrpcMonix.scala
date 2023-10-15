@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory
 
 object GrpcMonix {
 
-  private val logger                        = LoggerFactory.getLogger(logSource.clazz)
   implicit private val logSource: LogSource = LogSource(this.getClass)
+  private val logger                        = LoggerFactory.getLogger(logSource.clazz)
 
   type GrpcOperator[I, O] = StreamObserver[O] => StreamObserver[I]
   type Transformer[I, O]  = Observable[I] => Observable[O]

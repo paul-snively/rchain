@@ -5,6 +5,8 @@ import coop.rchain.sdk.syntax.all._
 import coop.rchain.shared.Base16
 import org.bouncycastle.asn1._
 import org.bouncycastle.util.BigIntegers
+import org.bouncycastle.x509.X509V3CertificateGenerator
+import org.bouncycastle.asn1.x509.X509Name
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File, FileInputStream}
 import java.math.BigInteger
@@ -59,7 +61,9 @@ object CertificateHelper {
       cf.generateCertificate(file).asInstanceOf[X509Certificate]
     }
 
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+  @SuppressWarnings(
+    Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.PlatformDefault")
+  )
   def readKeyPair(keyFile: File): KeyPair = {
     val str = Using.resource(Source.fromFile(keyFile)) {
       _.getLines().filter(!_.contains("KEY")).mkString
@@ -86,21 +90,31 @@ object CertificateHelper {
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   def generate(keyPair: KeyPair): X509Certificate = {
-    import sun.security.x509._
+//    import sun.security.x509._
 
-    val privateKey  = keyPair.getPrivate
-    val publicKey   = keyPair.getPublic
-    val address     = publicAddress(publicKey).map(Base16.encode).getOrElse("local")
-    val algorythm   = "SHA256withECDSA"
-    val algorithmId = new AlgorithmId(AlgorithmId.sha256WithECDSA_oid)
+    val privateKey = keyPair.getPrivate
+    val publicKey  = keyPair.getPublic
+    val address    = publicAddress(publicKey).map(Base16.encode).getOrElse("local")
+    val algorythm  = "SHA256withECDSA"
+    //   val algorithmId = new AlgorithmId(AlgorithmId.sha256WithECDSA_oid)
 
-    val info     = new X509CertInfo
-    val from     = new java.util.Date()
-    val to       = new java.util.Date(from.getTime + 365 * 86400000L)
-    val interval = new CertificateValidity(from, to)
-    val serial   = new BigInteger(64, new SecureRandom())
-    val owner    = new X500Name(s"CN=$address")
+//    val info     = new X509CertInfo
+    val from = new java.util.Date()
+    val to   = new java.util.Date(from.getTime + 365 * 86400000L)
+//    val interval = new CertificateValidity(from, to)
+    val serial = new BigInteger(64, new SecureRandom())
+    val owner  = new X509Name(s"CN=$address")
 
+    val certGen = new X509V3CertificateGenerator()
+    certGen.setNotBefore(from)
+    certGen.setNotAfter(to)
+    certGen.setSerialNumber(serial)
+    certGen.setSubjectDN(owner)
+    certGen.setIssuerDN(owner)
+    certGen.setPublicKey(publicKey)
+    certGen.setSignatureAlgorithm(algorythm)
+
+    /*
     info.set(X509CertInfo.VALIDITY, interval)
     info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(serial))
     info.set(X509CertInfo.SUBJECT, owner)
@@ -108,17 +122,23 @@ object CertificateHelper {
     info.set(X509CertInfo.KEY, new CertificateX509Key(publicKey))
     info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3))
     info.set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algorithmId))
+     */
 
     // Sign the cert to identify the algorithm that's used.
-    val cert = new X509CertImpl(info)
-    cert.sign(privateKey, algorythm)
+    //  val cert = new X509CertImpl(info)
+    val cert = certGen.generate(privateKey)
+//    cert.sign(privateKey, algorythm)
 
+    /*
     // Update the algorithm, and resign.
     val algorithmId2 = cert.get(X509CertImpl.SIG_ALG).asInstanceOf[AlgorithmId]
     info.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, algorithmId2)
     val cert2 = new X509CertImpl(info)
     cert2.sign(privateKey, algorythm)
     cert2
+     */
+
+    cert
   }
 
   def encodeSignatureRStoDER(signatureRS: Array[Byte]): Try[Array[Byte]] = {

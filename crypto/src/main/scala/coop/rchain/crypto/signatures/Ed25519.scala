@@ -9,6 +9,7 @@ object Ed25519 extends SignaturesAlg {
   val keyLength          = 32
   override val sigLength = 64
 
+  @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
   val name: String = "Ed25519".toLowerCase
 
   //TODO: Make use of strongly typed keys

@@ -36,6 +36,7 @@ object RSpaceExporter {
       flagLeafValues = true
     )
 
+    @SuppressWarnings(Array("org.wartremover.warts.SizeIs", "org.wartremover.warts.SeqApply"))
     def createLastPrefix(prefixSeq: Seq[Blake2b256Hash]) =
       if (prefixSeq.isEmpty) None // Start from root
       else {

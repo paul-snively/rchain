@@ -144,7 +144,7 @@ object Secp256k1 extends SignaturesAlg {
     */
   def toPublic(seckey: Array[Byte]): Array[Byte] =
     // WARNING: this code throws Assertion exception if input is not correct length
-    NativeSecp256k1.computePubkey(seckey)
+    NativeSecp256k1.computePubkey(seckey, false)
 
   override def toPublic(sec: PrivateKey): PublicKey = PublicKey(toPublic(sec.bytes))
 }

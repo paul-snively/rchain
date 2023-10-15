@@ -82,18 +82,18 @@ sealed abstract class LogInstances {
     val logger: Logger[F] = Slf4jLogger.getLoggerFromClass(ev.clazz)
 
     def trace(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(logger.trace(msg))
+      logger.trace(msg)
     def debug(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(logger.debug(msg))
+      logger.debug(msg)
     def info(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(logger.info(msg))
+      logger.info(msg)
     def warn(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(logger.warn(msg))
+      logger.warn(msg)
     def warn(msg: => String, cause: Throwable)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(logger.warn(cause)(msg))
+      logger.warn(cause)(msg)
     def error(msg: => String)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(logger.error(msg))
+      logger.error(msg)
     def error(msg: => String, cause: Throwable)(implicit ev: LogSource): F[Unit] =
-      Sync[F].delay(logger.error(cause)(msg))
+      logger.error(cause)(msg)
   }
 }

@@ -28,6 +28,7 @@ object Pretty extends PrettyInstances {
 
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
 trait PrettyInstances extends PrettyDerivation {
   import PrettyUtils._
 
@@ -126,6 +127,7 @@ trait PrettyDerivation {
         s"${ctx.typeName.short}${nonDefaultParameters(value, indentLevel)}"
       }
 
+    @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
     private def nonDefaultParameters(value: T, indentLevel: Int): String = {
       val nonDefaultParameters =
         ctx.parameters.filter(p => !p.default.contains(p.dereference(value)))
@@ -179,7 +181,13 @@ object PrettyUtils {
     * Convert a string to a C&P-able literal. Basically
     * copied verbatim from the uPickle source code.
     */
-  @SuppressWarnings(Array("org.wartremover.warts.Var", "org.wartremover.warts.NonUnitStatements"))
+  @SuppressWarnings(
+    Array(
+      "org.wartremover.warts.Var",
+      "org.wartremover.warts.NonUnitStatements",
+      "org.wartremover.warts.SeqApply"
+    )
+  )
   // TODO remove this var
   def literalize(s: IndexedSeq[Char], unicode: Boolean = true): String = {
     val sb = new StringBuilder

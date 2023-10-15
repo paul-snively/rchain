@@ -4,7 +4,7 @@ import cats.effect.Sync
 import cats.syntax.all._
 import coop.rchain.comm.CommError._
 import coop.rchain.comm._
-import coop.rchain.comm.protocol.routing.{RoutingGrpcMonix, _}
+import coop.rchain.comm.protocol.routing._
 import coop.rchain.metrics.Metrics
 import coop.rchain.metrics.implicits._
 import coop.rchain.monix.Monixable

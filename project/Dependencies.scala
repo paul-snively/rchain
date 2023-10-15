@@ -1,4 +1,5 @@
 import sbt._
+import Keys.scalaVersion
 
 object Dependencies {
 
@@ -18,7 +19,12 @@ object Dependencies {
   val log4catsVersion   = "1.7.0"
   val fs2GrpcVersion    = "2.7.9"
 
+  lazy val bitcoinSVersion = Def.settingKey[String]("Version of bitcoin-s to use.")
+
   // format: off
+  // This is an OrganizationArtifactName, to be completed into a ModuleID with bitcoinLibVersion.value later
+  val bitcoinS            = "org.bitcoin-s" % "bitcoin-s-secp256k1jni"
+
   val bouncyProvCastle    = "org.bouncycastle"            % "bcprov-jdk15on"            % "1.68"
   val bouncyPkixCastle    = "org.bouncycastle"            % "bcpkix-jdk15on"            % "1.68"
   val catsCore            = "org.typelevel"              %% "cats-core"                 % catsVersion
@@ -97,10 +103,12 @@ object Dependencies {
   val scodecCore          = "org.scodec"                 %% "scodec-core"               % "1.11.7"
   val scodecCats          = "org.scodec"                 %% "scodec-cats"               % "1.1.0-M4"
   val scodecBits          = "org.scodec"                 %% "scodec-bits"               % "1.1.23"
+  val scrypto             = "org.scorexfoundation"       %% "scrypto"                   % "2.3.0"
   // see https://jitpack.io/#rchain/secp256k1-java
   val secp256k1Java       = "com.github.rchain"           % "secp256k1-java"            % "0.1"
   val shapeless           = "com.chuusai"                %% "shapeless"                 % "2.3.8"
   val slf4j               = "org.slf4j"                   % "slf4j-api"                 % slf4jVersion
+  val sourcecode          = "com.lihaoyi"                %% "sourcecode"                % "0.3.1"
   val weupnp              = "org.bitlet"                  % "weupnp"                    % "0.1.4"
   // format: on
 
@@ -129,7 +137,6 @@ object Dependencies {
     // Overrides for transitive dependencies (we don't use them directly, hence no val-s)
     "com.github.jnr"         % "jnr-ffi"     % "2.2.12",
     "com.lihaoyi"            %% "geny"       % "0.6.10",
-    "com.lihaoyi"            %% "sourcecode" % "0.2.1",
     "org.scala-lang.modules" %% "scala-xml"  % "1.3.0",
     "com.typesafe"           % "config"      % "1.4.0"
   )
