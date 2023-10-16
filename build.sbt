@@ -11,6 +11,8 @@ Global / cancelable := true
 //resolve all version conflicts explicitly
 // Global / dependencyOverrides := Dependencies.overrides
 
+ThisBuild / libraryDependencies += compilerPlugin("io.tryp" % "splain_2.12.15" % "0.5.8")
+
 lazy val projectSettings = Seq(
   organization := "coop.rchain",
   scalaVersion := "2.12.18",
@@ -211,13 +213,7 @@ lazy val crypto = (project in file("crypto"))
   .settings(commonSettings: _*)
   .settings(
     name := "crypto",
-    // Believe it or not, bitcoin-s is built for Scala 2.12 at version 1.9.3, and 2.13 at version 1.9.7.
-    bitcoinSVersion := (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, n)) if n == 12 => "1.9.3"
-      case Some((2, n)) if n == 13 => "1.9.7"
-    }),
     libraryDependencies ++= commonDependencies ++ protobufLibDependencies ++ Seq(
-      bitcoinS % bitcoinSVersion.value,
       guava,
       bouncyPkixCastle,
       bouncyProvCastle,
@@ -492,7 +488,6 @@ lazy val rspace = (project in file("rspace"))
       fs2Core,
       scodecCore,
       scodecBits,
-      scrypto
     ),
     /* Tutorial */
     /* Publishing Settings */

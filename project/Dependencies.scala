@@ -19,8 +19,6 @@ object Dependencies {
   val log4catsVersion   = "1.7.0"
   val fs2GrpcVersion    = "2.7.9"
 
-  lazy val bitcoinSVersion = Def.settingKey[String]("Version of bitcoin-s to use.")
-
   // format: off
   // This is an OrganizationArtifactName, to be completed into a ModuleID with bitcoinLibVersion.value later
   val bitcoinS            = "org.bitcoin-s" % "bitcoin-s-secp256k1jni"
@@ -103,7 +101,6 @@ object Dependencies {
   val scodecCore          = "org.scodec"                 %% "scodec-core"               % "1.11.7"
   val scodecCats          = "org.scodec"                 %% "scodec-cats"               % "1.1.0-M4"
   val scodecBits          = "org.scodec"                 %% "scodec-bits"               % "1.1.23"
-  val scrypto             = "org.scorexfoundation"       %% "scrypto"                   % "2.3.0"
   // see https://jitpack.io/#rchain/secp256k1-java
   val secp256k1Java       = "com.github.rchain"           % "secp256k1-java"            % "0.1"
   val shapeless           = "com.chuusai"                %% "shapeless"                 % "2.3.8"

@@ -1,7 +1,7 @@
 package coop.rchain.rspace.hashing
 
 import com.google.protobuf.ByteString
-import scorex.crypto.hash.Blake2b256
+import coop.rchain.crypto.hash.Blake2b256
 import coop.rchain.shared.Base16
 import scodec.bits.{BitVector, ByteVector}
 import scodec.codecs._
@@ -55,10 +55,10 @@ object Blake2b256Hash {
     * @return The hash
     */
   def create(byteVectors: Seq[ByteVector]): Blake2b256Hash =
-    new Blake2b256Hash(ByteVector(Blake2b256.hash(byteVectors.map(_.toArray): _*)))
+    new Blake2b256Hash(ByteVector(Blake2b256.hash(byteVectors: _*)))
 
   def create(byteVector: ByteVector): Blake2b256Hash =
-    new Blake2b256Hash(ByteVector(Blake2b256.hash(byteVector.toArray)))
+    new Blake2b256Hash(ByteVector(Blake2b256.hash(byteVector)))
 
   def fromByteVector(bytes: ByteVector): Blake2b256Hash =
     new Blake2b256Hash(bytes)
