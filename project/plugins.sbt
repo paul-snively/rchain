@@ -15,7 +15,6 @@ addSbtPlugin("com.typesafe.sbt"       %  "sbt-license-report"   % "1.2.0")
 addSbtPlugin("com.github.tkawachi"    %  "sbt-repeat"           % "0.1.0")
 addSbtPlugin("com.jsuereth"           %  "sbt-pgp"              % "2.0.1")
 addSbtPlugin("org.xerial.sbt"         %  "sbt-sonatype"         % "2.6")
-addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat"       % "1.2.2")
 */
 
 addDependencyTreePlugin
