@@ -199,7 +199,7 @@ lazy val comm = (project in file("comm"))
       guava
     ),
     Compile / PB.targets := Seq(
-      scalapb.gen(grpc = false)  -> (Compile / sourceManaged).value,
+      coop.rchain.scalapb.gen(grpc = false)  -> (Compile / sourceManaged).value,
       grpcmonix.generators.gen() -> (Compile / sourceManaged).value
     )
   )
@@ -238,7 +238,7 @@ lazy val models = (project in file("models"))
       scalapbRuntimegGrpc
     ),
     Compile / PB.targets := Seq(
-      scalapb.gen(flatPackage = true, grpc = false) -> (Compile / sourceManaged).value,
+      coop.rchain.scalapb.gen(flatPackage = true, grpc = false) -> (Compile / sourceManaged).value,
       grpcmonix.generators.gen()                                -> (Compile / sourceManaged).value
     )
   )
@@ -274,7 +274,7 @@ lazy val node = (project in file("node"))
         pureconfig
       ),
     Compile / PB.targets := Seq(
-      scalapb.gen(grpc = false)  -> (Compile / sourceManaged).value / "protobuf",
+      coop.rchain.scalapb.gen(grpc = false)  -> (Compile / sourceManaged).value / "protobuf",
       grpcmonix.generators.gen() -> (Compile / sourceManaged).value / "protobuf"
     ),
     buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, git.gitHeadCommit),

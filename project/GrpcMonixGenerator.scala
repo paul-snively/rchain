@@ -35,7 +35,7 @@ object gen {
 
 object GrpcMonixGenerator extends CodeGenApp {
   override def registerExtensions(registry: ExtensionRegistry): Unit =
-    scalapb.options.Scalapb.registerAllExtensions(registry)
+    Scalapb.registerAllExtensions(registry)
 
   override def suggestedDependencies: Seq[Artifact] = Seq(
     Artifact(
@@ -53,7 +53,7 @@ object GrpcMonixGenerator extends CodeGenApp {
     ProtobufGenerator.parseParameters(request.parameter) match {
       case Right(params) =>
         try {
-          val implicits = DescriptorImplicits.fromCodeGenRequest(params, request)
+          val implicits = new DescriptorImplicits(params, request.allProtos)
           // Inserted custom printer
           val generator = new GrpcMonixGenerator(implicits)
           val validator = new ProtoValidation(implicits)
