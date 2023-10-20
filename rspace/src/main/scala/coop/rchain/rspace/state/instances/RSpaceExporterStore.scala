@@ -33,23 +33,22 @@ object RSpaceExporterStore {
 
     def getItems[Value](
         store: KeyValueStore[F],
-        keys: List[Blake2b256Hash],
+        keys: Vector[Blake2b256Hash],
         fromBuffer: ByteBuffer => Value
-    ): F[Seq[(Blake2b256Hash, Value)]] =
+    ): F[Vector[(Blake2b256Hash, Value)]] =
       for {
         loaded <- store.get(keys.map(_.bytes.toDirectByteBuffer), fromBuffer)
-        kv     <- keys.zip(loaded).traverseFilter(identity)
       } yield keys.zip(loaded).filter(_._2.nonEmpty).map(_.map(_.get))
 
     override def getHistoryItems[Value](
-        keys: Seq[Blake2b256Hash],
+        keys: Vector[Blake2b256Hash],
         fromBuffer: ByteBuffer => Value
-    ): F[Seq[(KeyHash, Value)]] = getItems(sourceHistoryStore, keys, fromBuffer)
+    ): F[Vector[(KeyHash, Value)]] = getItems(sourceHistoryStore, keys, fromBuffer)
 
     override def getDataItems[Value](
-        keys: Seq[Blake2b256Hash],
+        keys: Vector[Blake2b256Hash],
         fromBuffer: ByteBuffer => Value
-    ): F[Seq[(KeyHash, Value)]] = getItems(sourceValueStore, keys, fromBuffer)
+    ): F[Vector[(KeyHash, Value)]] = getItems(sourceValueStore, keys, fromBuffer)
 
     override def getNodes(
         startPath: NodePath,

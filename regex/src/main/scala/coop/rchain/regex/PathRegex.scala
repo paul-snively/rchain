@@ -18,6 +18,7 @@ private[regex] trait RegexOptions extends ParseOptions {
   val endsWith: List[String]
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 final case class PathRegexOptions(
     caseSensitive: Boolean = false,
     strict: Boolean = false,
@@ -65,7 +66,13 @@ private[regex] final case class PathToken(
     *
     * @throws IllegalArgumentException if token couldn't be formatted
     */
-  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
+  @SuppressWarnings(
+    Array(
+      "org.wartremover.warts.SizeIs",
+      "org.wartremover.warts.IterableOps",
+      "org.wartremover.warts.OptionPartial"
+    )
+  )
   private[regex] def formatSegment(
       args: Map[String, Iterable[String]],
       encode: String => String
@@ -82,7 +89,7 @@ private[regex] final case class PathToken(
         case Some(singleValue) if singleValue.size == 1 =>
           val encValue = encode(singleValue.head)
           if (matchRegex.get.pattern.matcher(encValue).matches) {
-            prefix.getOrElse("") + encValue
+            prefix.map(_.toString).getOrElse("") + encValue
           } else {
             throw new IllegalArgumentException(
               s"Expected $argName to match pattern ${matchRegex.get.pattern}, but got value $encValue"
@@ -94,9 +101,9 @@ private[regex] final case class PathToken(
               yield
                 if (matchRegex.get.pattern.matcher(encValue).matches) {
                   if (idx == 0) {
-                    prefix.getOrElse("") + encValue
+                    prefix.map(_.toString).getOrElse("") + encValue
                   } else {
-                    delimiter.getOrElse("") + encValue
+                    delimiter.map(_.toString).getOrElse("") + encValue
                   }
                 } else {
                   throw new IllegalArgumentException(
@@ -132,6 +139,7 @@ final case class PathRegex(tokens: List[PathToken], options: RegexOptions) {
     * Takes some arguments (argument can be a value or a sequence of values),
     * and builds an Uri-path
     */
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   def toPath(
       args: Map[String, Iterable[String]],
       encode: String => String = PathRegex.encodeUriComponent
@@ -186,10 +194,11 @@ final case class PathRegex(tokens: List[PathToken], options: RegexOptions) {
         List(s"(?:${options.delimiter}(?=$endsWith))?")
       }
 
+      @SuppressWarnings(Array("org.wartremover.warts.IterableOps"))
       val isEndDelimited = tokens.nonEmpty && tokens.last.rawPartChar
         .exists(options.delimiters.contains)
       val routeFinish = if (!isEndDelimited) {
-        List("(?=" + options.delimiter + "|" + endsWith + ")")
+        List("(?=" + options.delimiter.toString + "|" + endsWith + ")")
       } else {
         List.empty
       }
@@ -281,7 +290,7 @@ object PathRegex {
               toTokens(
                 ParseState(
                   parseState.subStr.substring(mc.end),
-                  rawPathPart + escapeStr.charAt(1),
+                  rawPathPart + escapeStr.charAt(1).toString,
                   parseState.tokens,
                   true
                 )
@@ -350,6 +359,7 @@ object PathRegex {
   /**
     * Compile a string to a template function for the path.
     */
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   def apply(str: String, options: PathRegexOptions = PathRegexOptions.default): PathRegex =
     PathRegex(parse(str, options), options)
 }

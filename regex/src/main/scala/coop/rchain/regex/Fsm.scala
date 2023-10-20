@@ -63,6 +63,7 @@ object Fsm {
     val transitions = mutable.Map[Int, Map[Char, Int]]()
 
     val sortedAlphabet = sortAlphabet(alphabet)
+    @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
     //we can't use any kind of range loop or iterators here, since collection is growing
     @tailrec
     def iterate(currentStateIdx: Int = 0, currentFinals: Set[Int] = Set()): Set[Int] = {
@@ -128,6 +129,7 @@ object Fsm {
       Some(next).filter(_.nonEmpty)
     }
 
+    @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
     def isFinal(fsmStates: Map[Int, Int]): Boolean = {
       val finalityStates = fsms.zipWithIndex.map {
         case (fsm, fsmIndex) =>
@@ -163,6 +165,7 @@ object Fsm {
     * Difference. Returns an FSM which recognises only the strings
     * recognised by the first FSM in the list, but none of the others.
     */
+  @SuppressWarnings(Array("org.wartremover.warts.IterableOps"))
   def difference(fsms: Fsm*): Fsm =
     parallel(finalityStates => finalityStates.head && !finalityStates.drop(1).forall(x => x), fsms)
 
@@ -263,7 +266,10 @@ final case class Fsm(
   require(finalStates != null, "finals can't be null")
   require(transitions != null, "map can't be null")
 
-  require(states.contains(initialState), "Initial state " + initialState + " must be one of states")
+  require(
+    states.contains(initialState),
+    "Initial state " + initialState.toString + " must be one of states"
+  )
   require(
     finalStates.forall(fin => states.contains(fin)),
     "Final states must be a subset of states"
@@ -273,14 +279,14 @@ final case class Fsm(
     (mapEntry, stateTransitionEntry) <- transitions
     (nextSymbol, nextState)          <- stateTransitionEntry
   } {
-    require(states.contains(mapEntry), "Map state " + mapEntry + " must be one of states")
+    require(states.contains(mapEntry), "Map state " + mapEntry.toString + " must be one of states")
     require(
       alphabet.contains(nextSymbol),
-      "Transition symbol " + nextSymbol + " -> " + nextState + " must be one of alphabet"
+      "Transition symbol " + nextSymbol.toString + " -> " + nextState.toString + " must be one of alphabet"
     )
     require(
       states.contains(nextState),
-      "Transition state  " + nextSymbol + " -> " + nextState + " must be one of states"
+      "Transition state  " + nextSymbol.toString + " -> " + nextState.toString + " must be one of states"
     )
   }
 
@@ -366,7 +372,7 @@ final case class Fsm(
       } else {
         return Failure(
           new NoSuchElementException(
-            "Symbol '" + currentSymbol + "' is not in the source alphabet."
+            "Symbol '" + currentSymbol.toString + "' is not in the source alphabet."
           )
         )
       }
@@ -478,7 +484,7 @@ final case class Fsm(
             .getOrElse(pendingState, Nil)
             .foreach({
               case (nextSymbol, nextState) => {
-                val nextString = pendingString + nextSymbol
+                val nextString = pendingString + nextSymbol.toString
                 if (livestates.contains(nextState)) {
                   pending += nextString -> nextState
                   if (finalStates.contains(nextState)) {
@@ -496,14 +502,10 @@ final case class Fsm(
         }
       }
 
-    def genStream: Stream[String] = {
-      val str = nextStr
-      if (str.isDefined) {
-        str.get #:: genStream
-      } else {
+    def genStream: Stream[String] =
+      nextStr.fold(
         Stream.empty[String]
-      }
-    }
+      )(s => s #:: genStream)
     genStream
   }
 
@@ -511,7 +513,7 @@ final case class Fsm(
     * Given an FSM and a multiplier, return the multiplied FSM.
     */
   def times(multiplier: Int): Fsm = {
-    require(multiplier >= 0, "Can't multiply an FSM by " + multiplier)
+    require(multiplier >= 0, "Can't multiply an FSM by " + multiplier.toString)
     //here we always work with "currentState -> iteration" pairs
     def initial = Set(this.initialState -> 0)
 

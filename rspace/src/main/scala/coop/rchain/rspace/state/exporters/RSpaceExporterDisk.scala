@@ -45,7 +45,7 @@ object RSpaceExporterDisk {
             startPath,
             chunkSize,
             skip,
-            k => historyStore.get(Seq(k.bytes.toDirectByteBuffer), ByteVector(_)).map(_.head)
+            k => historyStore.get(Vector(k.bytes.toDirectByteBuffer), ByteVector(_)).map(_.head)
           )
         )
 

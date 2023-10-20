@@ -21,12 +21,12 @@ final class KeyValueStoreOps[F[_]](
   // Suffix `1` because overload is not resolved and also because it gets one record
 
   def get1[T](key: ByteBuffer, fromBuffer: ByteBuffer => T)(implicit f: Functor[F]): F[Option[T]] =
-    store.get(Seq(key), fromBuffer).map(_.flatten.headOption)
+    store.get(Vector(key), fromBuffer).map(_.flatten.headOption)
 
   def put1[T](key: ByteBuffer, value: T, toBuffer: T => ByteBuffer): F[Unit] =
-    store.put(Seq((key, value)), toBuffer)
+    store.put(Vector((key, value)), toBuffer)
 
-  def putIfAbsent[T](kvPairs: Seq[(ByteBuffer, T)], toBuffer: T => ByteBuffer)(
+  def putIfAbsent[T](kvPairs: Vector[(ByteBuffer, T)], toBuffer: T => ByteBuffer)(
       implicit s: Sync[F]
   ): F[Unit] =
     for {
@@ -37,13 +37,13 @@ final class KeyValueStoreOps[F[_]](
     } yield ()
 
   def delete1(key: ByteBuffer)(implicit f: Functor[F]): F[Boolean] =
-    store.delete(Seq(key)).map(_ == 1)
+    store.delete(Vector(key)).map(_ == 1)
 
-  def contains(keys: Seq[ByteBuffer])(implicit f: Functor[F]): F[Seq[Boolean]] =
+  def contains(keys: Vector[ByteBuffer])(implicit f: Functor[F]): F[Seq[Boolean]] =
     store.get(keys, _ => ()).map(_.map(_.nonEmpty))
 
   def contains(key: ByteBuffer)(implicit f: Functor[F]): F[Boolean] =
-    contains(Seq(key)).map(_.forall(identity))
+    contains(Vector(key)).map(_.forall(identity))
 
   // From key-value store, with serializers for K and V, typed store can be created
   def toTypedStore[K, V](kCodec: Codec[K], vCodec: Codec[V])(

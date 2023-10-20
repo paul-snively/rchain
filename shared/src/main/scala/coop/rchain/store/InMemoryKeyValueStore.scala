@@ -10,12 +10,15 @@ final case class InMemoryKeyValueStore[F[_]: Sync]() extends KeyValueStore[F] {
 
   val state = TrieMap[ByteBuffer, ByteVector]()
 
-  override def get[T](keys: Seq[ByteBuffer], fromBuffer: ByteBuffer => T): F[Seq[Option[T]]] =
+  override def get[T](
+      keys: Vector[ByteBuffer],
+      fromBuffer: ByteBuffer => T
+  ): F[Vector[Option[T]]] =
     Sync[F].delay(
       keys.map(state.get).map(_.map(_.toByteBuffer).map(fromBuffer))
     )
 
-  override def put[T](kvPairs: Seq[(ByteBuffer, T)], toBuffer: T => ByteBuffer): F[Unit] =
+  override def put[T](kvPairs: Vector[(ByteBuffer, T)], toBuffer: T => ByteBuffer): F[Unit] =
     Sync[F].delay(
       kvPairs
         .foreach {
@@ -24,7 +27,7 @@ final case class InMemoryKeyValueStore[F[_]: Sync]() extends KeyValueStore[F] {
         }
     )
 
-  override def delete(keys: Seq[ByteBuffer]): F[Int] =
+  override def delete(keys: Vector[ByteBuffer]): F[Int] =
     Sync[F].delay(keys.map(state.remove).count(_.nonEmpty))
 
   override def iterate[T](f: Iterator[(ByteBuffer, ByteBuffer)] => T): F[T] =

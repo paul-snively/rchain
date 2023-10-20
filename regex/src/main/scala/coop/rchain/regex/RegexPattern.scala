@@ -142,6 +142,7 @@ sealed abstract class RegexPattern {
     */
   private[regex] def accepts(s: String): Boolean = toFsm().accepts(s)
 
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   def toFsm(alphabet: Option[Set[Char]] = None): Fsm
 
   final def toFsm(alphabet: Set[Char]): Fsm = toFsm(Some(alphabet))
@@ -237,6 +238,7 @@ object CharClassPattern extends ParsedPattern {
 
   def tryParse(str: CharSequence): Option[(RegexPattern, Int)] = {
 
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def parseHexChar(startIndex: Int, charsCount: Int): Option[(Char, Int)] =
       if (startIndex + charsCount <= str.length) {
         val substr = str.subSequence(startIndex, startIndex + charsCount).toString
@@ -455,6 +457,7 @@ object CharClassPattern extends ParsedPattern {
   * if the full alphabet is extremely large, but also requires dedicated
   * combination functions.
   */
+@SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 final case class CharClassPattern(charSet: Set[Char], negateCharSet: Boolean = false)
     extends RegexPattern {
   //chars should consist only of chars
@@ -565,6 +568,7 @@ final case class CharClassPattern(charSet: Set[Char], negateCharSet: Boolean = f
     case _ => false
   }
 
+  @SuppressWarnings(Array("org.wartremover.wart.DefaultArguments"))
   override def toFsm(alphabet: Option[Set[Char]] = None): Fsm = {
     val actualAlphabet = alphabet.getOrElse(this.alphabet)
     //0 is initial, 1 is final
@@ -757,6 +761,7 @@ final case class ConcPattern(mults: List[MultPattern]) extends RegexPattern {
     * "CZ, CZ" -> "CZ"
     * "CY, CZ" -> ""
     */
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   def common(that: ConcPattern, suffix: Boolean = false): ConcPattern =
     throw new NotImplementedError("TODO")
 }
@@ -862,6 +867,7 @@ final case class AltPattern(concs: Set[ConcPattern]) extends RegexPattern {
 }
 
 object MultPattern extends ParsedPattern {
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   def tryParse(str: CharSequence): Option[(MultPattern, Int)] = {
     //matches single charclass or unnamed group (...)
     def matchMultiplicand(startIndex: Int): Option[(RegexPattern, Int)] =

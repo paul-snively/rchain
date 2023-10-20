@@ -27,13 +27,13 @@ object RSpaceImporterStore {
     val roots = RootsStoreInstances.rootsStore(rootsStore)
 
     override def setHistoryItems[Value](
-        data: Seq[(Blake2b256Hash, Value)],
+        data: Vector[(Blake2b256Hash, Value)],
         toBuffer: Value => ByteBuffer
     ): F[Unit] =
       historyStore.put(data.map(_.leftMap(_.bytes.toDirectByteBuffer)), toBuffer)
 
     override def setDataItems[Value](
-        data: Seq[(Blake2b256Hash, Value)],
+        data: Vector[(Blake2b256Hash, Value)],
         toBuffer: Value => ByteBuffer
     ): F[Unit] =
       valueStore.put(data.map(_.leftMap(_.bytes.toDirectByteBuffer)), toBuffer)
@@ -42,6 +42,8 @@ object RSpaceImporterStore {
       roots.recordRoot(key)
 
     override def getHistoryItem(hash: Blake2b256Hash): F[Option[ByteVector]] =
-      historyStore.get(Seq(hash.bytes.toDirectByteBuffer), ByteVector(_)).map(_.flatten.headOption)
+      historyStore
+        .get(Vector(hash.bytes.toDirectByteBuffer), ByteVector(_))
+        .map(_.flatten.headOption)
   }
 }

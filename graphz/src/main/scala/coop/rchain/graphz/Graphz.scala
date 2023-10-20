@@ -59,6 +59,7 @@ case object NormalArrow extends GraphArrowType
 case object InvArrow    extends GraphArrowType
 case object NoneArrow   extends GraphArrowType
 
+@SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 object Graphz {
 
   implicit val showShape: Show[GraphShape] = Show.show {
@@ -167,6 +168,7 @@ object Graphz {
   val tab = "  "
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 class Graphz[F[_]: Monad](gtype: GraphType, t: String, val ser: GraphSerializer[F]) {
 
   def edge(edg: (String, String)): F[Unit] = edge(edg._1, edg._2)
