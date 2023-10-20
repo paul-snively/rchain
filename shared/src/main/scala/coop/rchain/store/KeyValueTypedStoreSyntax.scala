@@ -17,7 +17,8 @@ final class KeyValueTypedStoreOps[F[_], K, V](
   def errKVStoreExpectValue(hash: String) =
     s"Error when unsafe reading from KeyValueStore: value for key ${hash} not found."
 
-  def get1(key: K)(implicit f: Functor[F]): F[Option[V]] = store.get(Seq(key)).map(_.head)
+  def get1(key: K)(implicit f: Functor[F]): F[Option[V]] =
+    store.get(Seq(key)).map(_.flatten.headOption)
 
   def getUnsafeBatch(keys: Seq[K])(implicit f: Sync[F], show: Show[K]): F[List[V]] =
     store
@@ -41,7 +42,8 @@ final class KeyValueTypedStoreOps[F[_], K, V](
 
   def delete(key: K)(implicit f: Functor[F]): F[Boolean] = store.delete(Seq(key)).map(_ == 1)
 
-  def contains(key: K)(implicit f: Functor[F]): F[Boolean] = store.contains(Seq(key)).map(_.head)
+  def contains(key: K)(implicit f: Functor[F]): F[Boolean] =
+    store.contains(Seq(key)).map(_.forall(identity))
 
   def getOrElse(key: K, elseValue: V)(implicit f: Functor[F]): F[V] =
     get1(key).map(_.getOrElse(elseValue))

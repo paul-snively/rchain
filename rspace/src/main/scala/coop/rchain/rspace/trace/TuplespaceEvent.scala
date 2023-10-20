@@ -43,7 +43,7 @@ object TuplespaceEvent {
     case _ => None
   }
 
-  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs", "org.wartremover.warts.IterableOps"))
   def from(comm: COMM, incomingConsumes: Set[Consume]): Option[(Blake2b256Hash, TuplespaceEvent)] =
     comm match {
       case COMM(consume, produces, peeks, _) if produces.size == 1 => {

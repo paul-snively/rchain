@@ -168,6 +168,7 @@ object CertificateHelper {
       )
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   def decodeSignatureDERtoRS(signatureDER: Array[Byte]): Try[Array[Byte]] = {
     def toBytes(x: ASN1Encodable) = {
       val asn1 = x.toASN1Primitive.asInstanceOf[ASN1Integer]
@@ -228,6 +229,7 @@ object CertificatePrinter {
     split(str).mkString("-----BEGIN PRIVATE KEY-----\n", "\n", "\n-----END PRIVATE KEY-----")
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   @tailrec
   private def split(s: String, acc: List[String] = Nil): List[String] =
     if (s.length == 0) acc.reverse

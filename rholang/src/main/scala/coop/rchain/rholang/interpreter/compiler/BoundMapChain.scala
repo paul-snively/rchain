@@ -17,6 +17,7 @@ import cats.syntax.all._
   * @param chain A vector of bound variable maps.
   * @tparam T The typing discipline we're enforcing.
   */
+@SuppressWarnings(Array("org.wartremover.warts.SeqApply", "org.wartremover.warts.SeqUpdated"))
 final case class BoundMapChain[T](chain: Vector[BoundMap[T]]) {
 
   def get(name: String): Option[BoundContext[T]] = chain.head.get(name)

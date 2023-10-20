@@ -120,7 +120,7 @@ object ConflictResolutionLogic {
           }
           .partition { case (_, rjDone) => rjDone.isDefined }
         val end  = done.isEmpty && continue.isEmpty
-        val out  = done.map(_._2.get)
+        val out  = done.map(_._2.getOrElse(Set.empty[D]))
         val next = continue.flatMap(_._1)
         (!end).guard[Option].as((out, next))
       }

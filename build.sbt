@@ -13,6 +13,10 @@ Global / cancelable := true
 
 ThisBuild / libraryDependencies += compilerPlugin("io.tryp" % "splain_2.12.15" % "0.5.8")
 
+val allowedWarts = Set(
+  wartremover.Wart.Any
+)
+
 lazy val projectSettings = Seq(
   organization := "coop.rchain",
   scalaVersion := "2.12.18",
@@ -22,6 +26,7 @@ lazy val projectSettings = Seq(
     Resolver.sonatypeOssRepos("snapshots") ++
     Seq("jitpack" at "https://jitpack.io"),
   wartremoverExcluded += sourceManaged.value,
+/* WTAF?
   Compile / compile / wartremoverErrors ++= Warts.allBut(
     // those we want
     Wart.DefaultArguments,
@@ -53,6 +58,8 @@ lazy val projectSettings = Seq(
     Wart.StringPlusAny,
     Wart.AnyVal
   ),
+*/
+  wartremoverErrors ++= (Warts.unsafe.filterNot(w => allowedWarts.contains(w))),
   scalafmtOnCompile := !sys.env.contains("CI"), // disable in CI environments
   Test / testOptions += Tests.Argument("-oD"), //output test durations
   javacOptions ++= Seq("-source", "11", "-target", "11"),

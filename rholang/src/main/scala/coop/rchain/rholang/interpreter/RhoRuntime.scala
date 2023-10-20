@@ -11,7 +11,7 @@ import coop.rchain.metrics.Metrics.Source
 import coop.rchain.metrics.{Metrics, Span}
 import coop.rchain.models.TaggedContinuation.TaggedCont.ScalaBodyRef
 import coop.rchain.models.Var.VarInstance.FreeVar
-import coop.rchain.models._
+import coop.rchain.models.{Match => MMatch, _}
 import coop.rchain.models.rholang.implicits._
 import coop.rchain.rholang.RholangMetricsSource
 import coop.rchain.rholang.interpreter.RhoRuntime.{RhoISpace, RhoReplayISpace}
@@ -25,7 +25,7 @@ import coop.rchain.rspace.hashing.Blake2b256Hash
 import coop.rchain.rspace.history.HistoryRepository
 import coop.rchain.rspace.internal.{Datum, Row, WaitingContinuation}
 import coop.rchain.rspace.util.unpackOption
-import coop.rchain.rspace.{Match, _}
+import coop.rchain.rspace._
 import coop.rchain.shared.Log
 import monix.execution.Scheduler
 
@@ -453,6 +453,7 @@ object RhoRuntime {
     } yield (reducer, blockDataRef)
 
   // This is from Nassim Taleb's "Skin in the Game"
+  @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
   val bootstrapRand: Blake2b512Random = Blake2b512Random(
     ("Decentralization is based on the simple notion that it is easier to macrobull***t than microbull***t. " +
       "Decentralization reduces large structural asymmetries.")

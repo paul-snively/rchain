@@ -63,10 +63,10 @@ trait Costs {
   final val ADD_COST    = Cost(3, "addition") // map/set add is eC
 
   // decoding to bytes is linear with respect to the length of the string
-  def hexToBytesCost(str: String): Cost = Cost(str.size, "hex to bytes")
+  def hexToBytesCost(str: String): Cost = Cost(str.length, "hex to bytes")
 
   // encoding to hex is linear with respect to the length of the byte array
-  def bytesToHexCost(bytes: Array[Byte]): Cost = Cost(bytes.size, "bytes to hex")
+  def bytesToHexCost(bytes: Array[Byte]): Cost = Cost(bytes.length, "bytes to hex")
 
   // Both Set#remove and Map#remove have complexity of eC
   def diffCost(numElements: Int): Cost =
@@ -145,7 +145,8 @@ trait Costs {
 
   def toListCost(size: Int): Cost = Cost(size, "toList")
 
-  def parsingCost(term: String): Cost = Cost(term.getBytes.size, "parsing")
+  @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
+  def parsingCost(term: String): Cost = Cost(term.getBytes.length, "parsing")
 
   final val NTH_METHOD_CALL_COST: Cost = Cost(10, "nth method call")
 

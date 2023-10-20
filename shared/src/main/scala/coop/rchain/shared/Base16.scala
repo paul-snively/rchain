@@ -11,6 +11,7 @@ object Base16 {
     * @param input
     * @return
     */
+  @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
   def unsafeDecode(input: String): Array[Byte] = decode(input, "[^0-9A-Fa-f]").get
 
   /**
@@ -20,6 +21,7 @@ object Base16 {
     * @return None if any non-hex and non-separator characters are encountered in the input
     *         Some otherwise
     */
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   def decode(input: String, separatorsRx: String = ""): Option[Array[Byte]] =
     Try {
       val digitsOnly = input.replaceAll(separatorsRx, "")

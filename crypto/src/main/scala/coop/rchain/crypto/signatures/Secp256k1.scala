@@ -48,6 +48,7 @@ object Secp256k1 extends SignaturesAlg {
     (PrivateKey(sec), PublicKey(pub))
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   def parsePemFile[F[_]: Sync](path: Path, password: String): F[PrivateKey] = {
     import scala.collection.JavaConverters._
 

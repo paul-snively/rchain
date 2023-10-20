@@ -40,6 +40,7 @@ private final case class LmdbStoreManagerImpl[F[_]: Concurrent: Log](
   }
   import EnvRefStatus._
 
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   private case class DbState(
       status: EnvRefStatus,
       inProgress: Int,

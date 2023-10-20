@@ -33,11 +33,12 @@ object RSpaceExporterStore {
 
     def getItems[Value](
         store: KeyValueStore[F],
-        keys: Seq[Blake2b256Hash],
+        keys: List[Blake2b256Hash],
         fromBuffer: ByteBuffer => Value
     ): F[Seq[(Blake2b256Hash, Value)]] =
       for {
         loaded <- store.get(keys.map(_.bytes.toDirectByteBuffer), fromBuffer)
+        kv     <- keys.zip(loaded).traverseFilter(identity)
       } yield keys.zip(loaded).filter(_._2.nonEmpty).map(_.map(_.get))
 
     override def getHistoryItems[Value](

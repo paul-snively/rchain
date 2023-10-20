@@ -4,6 +4,7 @@ import cats._
 import cats.effect.concurrent.Ref
 import cats.syntax.all._
 
+@SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 trait GraphSerializer[F[_]] {
   def push(str: String, suffix: String = "\n"): F[Unit]
 }

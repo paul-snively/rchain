@@ -22,6 +22,7 @@ final case class NoopSpan[F[_]: Applicative]() extends Span[F] {
   override def withMarks[A](label: String)(block: F[A]): F[A] = block
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 trait Metrics[F[_]] {
   // Counter
   def incrementCounter(name: String, delta: Long = 1)(implicit ev: Metrics.Source): F[Unit]
@@ -46,6 +47,7 @@ trait Metrics[F[_]] {
 object Metrics extends MetricsInstances {
   def apply[F[_]](implicit M: Metrics[F]): Metrics[F] = M
 
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   class MetricsNOP[F[_]: Applicative] extends Metrics[F] {
     def incrementCounter(name: String, delta: Long = 1)(implicit ev: Metrics.Source): F[Unit] =
       ().pure[F]

@@ -87,6 +87,7 @@ object RholangMergingLogic {
     * @param changes Channel changes to calculate new random generator
     * @param getBaseData Base state value reader
     */
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
   def calculateNumberChannelMerge[F[_]: Monad](
       channelHash: Blake2b256Hash,
       diff: Long,
@@ -135,6 +136,7 @@ object RholangMergingLogic {
     parsWithRnd.randomState
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
   def getNumberWithRnd(parWithRnd: ListParWithRandom): (Long, Blake2b512Random) = {
     assert(parWithRnd.pars.size == 1, {
       s"Number channel should contain single Int term, found ${parWithRnd.pars}."
@@ -170,6 +172,7 @@ object RholangMergingLogic {
   /**
     * Converts function to get all data on a channel to function to get single number value.
     */
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
   def convertToReadNumber[F[_]: Monad](
       getDataFunc: Blake2b256Hash => F[Seq[Datum[ListParWithRandom]]]
   ): Blake2b256Hash => F[Option[Long]] =

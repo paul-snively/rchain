@@ -24,6 +24,7 @@ object LmdbDirStoreManager {
     * @param id unique identifier
     * @param nameOverride name to use as database name instead of [[id]]
     */
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   final case class Db(id: String, nameOverride: Option[String] = none)
 
   // Mega, giga and tera bytes
@@ -31,6 +32,7 @@ object LmdbDirStoreManager {
   val gb = 1024L * mb
   val tb = 1024L * gb
 
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   final case class LmdbEnvConfig(
       name: String,
       // Max LMDB environment (file) size

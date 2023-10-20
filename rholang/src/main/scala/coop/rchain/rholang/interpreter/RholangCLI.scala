@@ -186,6 +186,7 @@ object RholangCLI {
     repl(runtime)
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
   def processFile(
       conf: Conf,
       runtime: RhoRuntime[Task],

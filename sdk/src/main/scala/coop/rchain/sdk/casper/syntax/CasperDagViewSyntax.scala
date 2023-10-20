@@ -27,7 +27,7 @@ final class CasperDagViewOps[F[_], M, MId, S, SId](private val dagView: DagView[
   def checkBlockNumber(msg: M)(implicit s: Applicative[F]): F[Boolean] =
     msg.justifications.toList
       .traverse(dagView.loadMessage)
-      .map(_.map(_.blockNum).max + 1)
+      .map(_.map(_.blockNum).foldLeft(0L)(Math.max) + 1)
       .map(_ != msg.blockNum)
 
   /**

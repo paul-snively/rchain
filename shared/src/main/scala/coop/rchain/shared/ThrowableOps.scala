@@ -22,6 +22,7 @@ object ThrowableOps {
       loop(th, z)
     }
 
+    @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
     def toMessageList(prefix: String = "Caused by: "): Seq[String] =
       fold(Seq.empty[String]) { (ms, t) =>
         Option(t.getMessage)

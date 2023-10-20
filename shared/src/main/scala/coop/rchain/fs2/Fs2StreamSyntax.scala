@@ -45,6 +45,7 @@ class Fs2StreamOps[F[_], A](
   /**
     * Variant of [[Stream.evalFilterAsync]] without keeping order of results.
     */
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   def evalFilterAsyncUnordered[F2[x] >: F[x]: Concurrent](
       maxConcurrent: Int
   )(f: A => F2[Boolean]): Stream[F2, A] =
@@ -67,6 +68,7 @@ class Fs2StreamOps[F[_], A](
 
     * @param p predicate after which stream will terminate
     */
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   def terminateAfter(p: A => Boolean): Stream[F, A] =
     stream.flatMap(x => if (p(x)) Stream(x.some, none) else Stream(x.some)).unNoneTerminate
 

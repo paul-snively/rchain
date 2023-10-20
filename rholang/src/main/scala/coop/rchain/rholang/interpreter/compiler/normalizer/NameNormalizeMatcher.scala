@@ -3,7 +3,7 @@ package coop.rchain.rholang.interpreter.compiler.normalizer
 import cats.effect.Sync
 import cats.syntax.all._
 import coop.rchain.models.Var.VarInstance.{BoundVar, FreeVar, Wildcard}
-import coop.rchain.models.rholang.implicits.{VectorPar, _}
+import coop.rchain.models.rholang.implicits._
 import coop.rchain.models.{EVar, Par, Var}
 import coop.rchain.rholang.ast.rholang_mercury.Absyn.{Name, NameQuote, NameVar, NameWildcard}
 import coop.rchain.rholang.interpreter.compiler.{

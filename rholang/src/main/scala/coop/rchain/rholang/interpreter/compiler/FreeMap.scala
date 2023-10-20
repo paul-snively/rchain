@@ -11,6 +11,7 @@ import coop.rchain.models.Connective.ConnectiveInstance
   * @param connectives A list of the positions of logical connectives.
   * @tparam T The typing discipline we're enforcing.
   */
+@SuppressWarnings(Array("org.wartremover.warts.ListAppend"))
 final case class FreeMap[T](
     nextLevel: Int,
     levelBindings: Map[String, FreeContext[T]],

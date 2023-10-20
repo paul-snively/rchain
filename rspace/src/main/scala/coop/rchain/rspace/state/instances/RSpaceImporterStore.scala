@@ -42,6 +42,6 @@ object RSpaceImporterStore {
       roots.recordRoot(key)
 
     override def getHistoryItem(hash: Blake2b256Hash): F[Option[ByteVector]] =
-      historyStore.get(Seq(hash.bytes.toDirectByteBuffer), ByteVector(_)).map(_.head)
+      historyStore.get(Seq(hash.bytes.toDirectByteBuffer), ByteVector(_)).map(_.flatten.headOption)
   }
 }

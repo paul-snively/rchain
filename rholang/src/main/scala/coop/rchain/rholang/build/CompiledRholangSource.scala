@@ -16,6 +16,7 @@ abstract class CompiledRholangSource[Env](val code: String, val normalizerEnv: N
   final def env = normalizerEnv.toEnv
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
 object CompiledRholangSource {
   def loadSource(classpath: String) = {
     val fileContent = Source.fromResource(classpath).mkString
@@ -52,6 +53,7 @@ abstract class CompiledRholangTemplate[Env](
   override val path: String = classpath
 }
 
+@SuppressWarnings(Array("org.wartremover.warts.PlatformDefault"))
 object CompiledRholangTemplate {
   def loadTemplate(classpath: String, macros: Seq[(String, Any)]) = {
     val originalContent = Source.fromResource(classpath).mkString

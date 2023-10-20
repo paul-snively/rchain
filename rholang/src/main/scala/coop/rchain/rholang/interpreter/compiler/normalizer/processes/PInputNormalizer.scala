@@ -31,6 +31,7 @@ import scala.collection.convert.ImplicitConversionsToScala._
 import scala.collection.immutable.{BitSet, Vector}
 import java.util.UUID
 
+@SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
 object PInputNormalizer {
   @SuppressWarnings(Array("org.wartremover.warts.NonUnitStatements"))
   def normalize[F[_]: Sync](p: PInput, input: ProcVisitInputs)(

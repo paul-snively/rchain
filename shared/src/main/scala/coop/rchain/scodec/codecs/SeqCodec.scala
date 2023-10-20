@@ -3,6 +3,7 @@ package coop.rchain.scodec.codecs
 import scodec.bits.BitVector
 import scodec.{Attempt, Codec, DecodeResult, Decoder, Encoder, SizeBound}
 
+@SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 final class SeqCodec[A](codec: Codec[A], limit: Option[Int] = None) extends Codec[Seq[A]] {
 
   def sizeBound: SizeBound = limit match {

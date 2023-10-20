@@ -23,8 +23,14 @@ import coop.rchain.rholang.interpreter.compiler.normalizer.{
 import scala.collection.immutable.BitSet
 import java.util.UUID
 import scala.collection.convert.ImplicitConversionsToScala._
+@SuppressWarnings(
+  Array(
+    "org.wartremover.warts.SeqApply",
+    "org.wartremover.warts.NonUnitStatements",
+    "org.wartremover.warts.ListAppend"
+  )
+)
 object PLetNormalizer {
-  @SuppressWarnings(Array("org.wartremover.warts.NonUnitStatements"))
   def normalize[F[_]: Sync](p: PLet, input: ProcVisitInputs)(
       implicit env: Map[String, Par]
   ): F[ProcVisitOutputs] =

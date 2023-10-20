@@ -3,7 +3,7 @@ package coop.rchain.rholang.interpreter
 import cats.effect.Sync
 import cats.effect.concurrent.Ref
 import cats.syntax.all._
-import cats.{Parallel, Eval => _}
+import cats.{Parallel, Eval => CEval}
 import com.google.protobuf.ByteString
 import coop.rchain.crypto.hash.Blake2b512Random
 import coop.rchain.models.Expr.ExprInstance._
@@ -168,6 +168,7 @@ class DebruijnInterpreter[M[_]: Sync: Parallel: _cost](
     * particular concurrency semantics is desired, it should be achieved by modifying the `Parallel` instance, not by
     * modifying this method.
     */
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
   override def eval(par: Par)(
       implicit env: Env[Par],
       rand: Blake2b512Random
@@ -888,6 +889,7 @@ class DebruijnInterpreter[M[_]: Sync: Parallel: _cost](
 
   private[this] val nth: Method = new Method() {
 
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
     def localNth(ps: Seq[Par], nth: Int): Either[ReduceError, Par] =
       if (ps.isDefinedAt(nth)) ps(nth).asRight[ReduceError]
       else ReduceError("Error: index out of bound: " + nth).asLeft[Par]
@@ -1296,6 +1298,7 @@ class DebruijnInterpreter[M[_]: Sync: Parallel: _cost](
         case other => MethodNotDefined("getOrElse", other.typ).raiseError[M, Par]
       }
 
+    @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
     override def apply(p: Par, args: Seq[Par])(implicit env: Env[Par]): M[Par] =
       for {
         _ <- MethodArgumentNumberMismatch("getOrElse", 2, args.length)
@@ -1309,6 +1312,7 @@ class DebruijnInterpreter[M[_]: Sync: Parallel: _cost](
       } yield result
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
   private[this] val set: Method = new Method() {
 
     def set(baseExpr: Expr, key: Par, value: Par): M[Par] =
@@ -1402,6 +1406,7 @@ class DebruijnInterpreter[M[_]: Sync: Parallel: _cost](
       } yield result
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.SeqApply"))
   private[this] val slice: Method = new Method() {
 
     def slice(baseExpr: Expr, from: Int, until: Int): M[Par] =

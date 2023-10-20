@@ -62,6 +62,7 @@ final case class LmdbKeyValueStore[F[_]: Sync](
     }
 
   // PUT
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   override def put[T](kvPairs: Seq[(ByteBuffer, T)], toBuffer: T => ByteBuffer): F[Unit] = {
     // Buffers for key and value created outside of transaction.
     // Why this helps (or why corruption happens) is not clear but this code will prevent corruption of the database.

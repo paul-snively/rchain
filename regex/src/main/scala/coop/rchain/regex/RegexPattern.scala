@@ -311,6 +311,9 @@ object CharClassPattern extends ParsedPattern {
 
       //def add(value: Either[Char, CharClassPattern]) : ParseState = addOverrideState(value, rangeState)
 
+      @SuppressWarnings(
+        Array("org.wartremover.warts.DefaultArguments", "org.wartremover.warts.IterableOps")
+      )
       def add(
           value: Either[Char, CharClassPattern],
           overrideRangeState: Option[RangeState.Value] = None
@@ -355,6 +358,7 @@ object CharClassPattern extends ParsedPattern {
     //this function parses interior of a char set [abc-xyz], assuming that
     //entry '[^' is handled outside, and finished parsing if ']' found
     //in case of any error, including absent of ']' returns None
+    @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
     def parseCharSetSequence(
         startIndex: Int,
         negateCharSet: Boolean
@@ -460,7 +464,7 @@ final case class CharClassPattern(charSet: Set[Char], negateCharSet: Boolean = f
 
   override def hashCode(): Int = if (negateCharSet) charSet.hashCode() else -charSet.hashCode()
 
-  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs", "org.wartremover.warts.IterableOps"))
   override def toString: String = {
     def isPrintable(c: Char): Boolean =
       ((c >= 32) && (c <= 127)) || (!Character.isISOControl(c) && {
@@ -471,9 +475,9 @@ final case class CharClassPattern(charSet: Set[Char], negateCharSet: Boolean = f
     def singleCharToString(c: Char): String =
       if (CharClassPattern.allSpecialChars.contains(c)) {
         //this character needs escape
-        "\\" + c
+        "\\" + c.toString
       } else if (CharClassPattern.revEscapes.contains(c)) {
-        "\\" + CharClassPattern.revEscapes(c)
+        "\\" + CharClassPattern.revEscapes(c).toString
       } else if ((c >= 128) && (c <= 255)) {
         "\\x%02X".format(c.toInt)
       } else if (isPrintable(c)) {
@@ -488,6 +492,7 @@ final case class CharClassPattern(charSet: Set[Char], negateCharSet: Boolean = f
       }
 
     def unknownSetToString: String = {
+      @SuppressWarnings(Array("org.wartremover.warts.IterableOps"))
       def listToString(lst: List[Char]): String = lst.size match {
         case 0     => ""
         case 1     => singleCharToString(lst.head)
@@ -546,7 +551,7 @@ final case class CharClassPattern(charSet: Set[Char], negateCharSet: Boolean = f
       //check for well-known class first, render the set otherwise
       CharClassPattern.knownClassMap
         .find(_._2 == this)
-        .map("\\" + _._1)
+        .map("\\" + _._1.toString)
         .getOrElse {
           val inv = if (negateCharSet) "^" else ""
           s"[$inv$unknownSetToString]"
@@ -959,7 +964,7 @@ final case class MultPattern(multiplicand: RegexPattern, multiplier: Multiplier)
     val optionalFsm = if (multiplier.optional == Multiplier.Inf) {
       startFsm.star
     } else {
-      (Fsm.epsilonFsm(actualAlphabet) | startFsm) * multiplier.optional.get
+      (Fsm.epsilonFsm(actualAlphabet) | startFsm) * multiplier.optional.getOrElse(0)
     }
 
     mandatoryFsm + optionalFsm

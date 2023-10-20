@@ -4,7 +4,7 @@ import cats.effect._
 import cats.mtl._
 import cats.mtl.implicits._
 import cats.syntax.all._
-import cats.{FlatMap, Monad, MonoidK, Eval => _}
+import cats.{FlatMap, Monad, MonoidK, Eval => CEval}
 import coop.rchain.catscontrib._
 import coop.rchain.models.Connective.ConnectiveInstance
 import coop.rchain.models.Connective.ConnectiveInstance._
@@ -12,7 +12,7 @@ import coop.rchain.models.Expr.ExprInstance._
 import coop.rchain.models.GUnforgeable.UnfInstance.{GDeployerIdBody, GPrivateBody}
 import coop.rchain.models.Var.VarInstance.{FreeVar, Wildcard}
 import coop.rchain.models._
-import coop.rchain.models.rholang.implicits.{VectorPar, _}
+import coop.rchain.models.rholang.implicits._
 import coop.rchain.rholang.interpreter._
 import coop.rchain.rholang.interpreter.errors.BugFoundError
 import coop.rchain.rholang.interpreter.matcher.ParSpatialMatcherUtils.{noFrees, subPars}
@@ -228,6 +228,7 @@ object SpatialMatcher extends SpatialMatcherInstances {
     (a, b) => memo.getOrElseUpdate((a, b), f(a, b))
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.SizeIs"))
   private def aggregateUpdates[F[_]: Splittable: Alternative: Monad: _error: _freeMap](
       freeMaps: Seq[FreeMap]
   ): F[FreeMap] =

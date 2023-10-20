@@ -46,6 +46,7 @@ package object util {
   /**
     * Extracts a continuation from a produce result
     */
+  @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
   def getK[A, K](t: Option[(K, A)]): K =
     t.map(_._1).get
 

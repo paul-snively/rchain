@@ -109,7 +109,9 @@ class Blake2b512Random private (
     ((digest.hashCode * 31 + pathView.position()) * 31 + position) * 31 + lastBlock.hashCode
 }
 
-@SuppressWarnings(Array("org.wartremover.warts.NonUnitStatements"))
+@SuppressWarnings(
+  Array("org.wartremover.warts.NonUnitStatements", "org.wartremover.warts.IterableOps")
+)
 object Blake2b512Random {
   private[this] def apply(init: Array[Byte], offset: Int, length: Int): Blake2b512Random = {
     val result = new Blake2b512Random(Blake2b512Block(0.toByte), ByteBuffer.allocate(128))

@@ -4,7 +4,7 @@ object EqualitySpecUtils {
 
   // As long as all the components of the tested object are constructed in the `value` thunk,
   // this will catch just comparing the references (the test will fail).
-  @SuppressWarnings(Array("org.wartremover.warts.ListUnapply"))
+  @SuppressWarnings(Array("org.wartremover.warts.ListUnapply", "org.wartremover.warts.Null"))
   def checkValueBasedEquality[A](nonCollidingValues: => Seq[A]) = {
     val lefts  = nonCollidingValues
     val rights = nonCollidingValues
