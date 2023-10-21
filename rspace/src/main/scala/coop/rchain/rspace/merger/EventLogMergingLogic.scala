@@ -1,5 +1,7 @@
 package coop.rchain.rspace.merger
 
+import cats._, cats.implicits._
+
 import coop.rchain.rspace.hashing.Blake2b256Hash
 import coop.rchain.rspace.trace.{Consume, Produce}
 import fs2.Stream
@@ -125,8 +127,9 @@ object EventLogMergingLogic {
   }
 
   /** If produce is copied by peek in one index and originated in another - it is considered as created in aggregate. */
-  def combineProducesCopiedByPeek(x: EventLogIndex, y: EventLogIndex): Set[Produce] =
-    Seq(x, y)
-      .map(_.producesCopiedByPeek)
-      .reduce(_ ++ _) diff Seq(x, y).map(producesCreated).reduce(_ ++ _)
+  def combineProducesCopiedByPeek(x: EventLogIndex, y: EventLogIndex): Set[Produce] = {
+    val copied   = List(x, y).map(_.producesCopiedByPeek).combineAll
+    val produced = List(x, y).map(producesCreated).combineAll
+    copied diff produced
+  }
 }

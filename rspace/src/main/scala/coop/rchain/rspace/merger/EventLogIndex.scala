@@ -1,9 +1,10 @@
 package coop.rchain.rspace.merger
 
+import cats._, cats.implicits._
+
 import cats.effect.Concurrent
 import cats.effect.concurrent.Ref
-import cats.kernel.Monoid
-import cats.syntax.all._
+
 import coop.rchain.rspace.merger.EventLogMergingLogic.{
   combineProducesCopiedByPeek,
   NumberChannelsDiff
@@ -159,16 +160,16 @@ object EventLogIndex {
     )
 
   def combine(x: EventLogIndex, y: EventLogIndex): EventLogIndex = EventLogIndex(
-    Seq(x, y).map(_.producesLinear).reduce(_ ++ _),
-    Seq(x, y).map(_.producesPersistent).reduce(_ ++ _),
-    Seq(x, y).map(_.producesConsumed).reduce(_ ++ _),
-    Seq(x, y).map(_.producesPeeked).reduce(_ ++ _),
+    List(x, y).map(_.producesLinear).combineAll,
+    List(x, y).map(_.producesPersistent).combineAll,
+    List(x, y).map(_.producesConsumed).combineAll,
+    List(x, y).map(_.producesPeeked).combineAll,
     combineProducesCopiedByPeek(x, y),
     //TODO this joins combination is very restrictive. Join might be originated inside aggregated event log
-    Seq(x, y).map(_.producesTouchingBaseJoins).reduce(_ ++ _),
-    Seq(x, y).map(_.consumesLinearAndPeeks).reduce(_ ++ _),
-    Seq(x, y).map(_.consumesPersistent).reduce(_ ++ _),
-    Seq(x, y).map(_.consumesProduced).reduce(_ ++ _),
+    List(x, y).map(_.producesTouchingBaseJoins).combineAll,
+    List(x, y).map(_.consumesLinearAndPeeks).combineAll,
+    List(x, y).map(_.consumesPersistent).combineAll,
+    List(x, y).map(_.consumesProduced).combineAll,
     // Combine mergeable produces
     x.producesMergeable |+| y.producesMergeable,
     x.consumesMergeable |+| y.consumesMergeable,

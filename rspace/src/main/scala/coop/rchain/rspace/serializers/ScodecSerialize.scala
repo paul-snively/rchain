@@ -198,6 +198,7 @@ object ScodecSerialize {
 
   private val memoSt = TrieMap[Any, Any]()
 
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   private def memoize[A, B](prefix: String, f: A => B): A => B = { key =>
     memoSt.getOrElseUpdate((prefix, key), f(key)).asInstanceOf[B]
   }

@@ -21,6 +21,7 @@ object RSpaceExporter {
 
   final case object EmptyHistoryException extends Exception
 
+  @SuppressWarnings(Array("org.wartremover.warts.IterableOps"))
   def traverseHistory[F[_]: Sync](
       startPath: Seq[(Blake2b256Hash, Option[Byte])],
       skip: Int,

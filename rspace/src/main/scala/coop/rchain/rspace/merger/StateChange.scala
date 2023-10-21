@@ -42,6 +42,7 @@ object StateChange {
       deleted    = startValue diff endValue
     } yield ChannelChange(added, deleted)
 
+  @SuppressWarnings(Array("org.wartremover.warts.IterableOps"))
   def apply[F[_]: Concurrent, C, P, A, K](
       preStateReader: HistoryReaderBinary[F, C, P, A, K],
       postStateReader: HistoryReaderBinary[F, C, P, A, K],

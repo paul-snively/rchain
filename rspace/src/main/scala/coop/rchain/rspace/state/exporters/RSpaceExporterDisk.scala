@@ -23,6 +23,7 @@ object RSpaceExporterDisk {
       chunkSize: Int
   ): F[Unit] = {
     type Param = (Seq[(Blake2b256Hash, Option[Byte])], Int)
+    @SuppressWarnings(Array("org.wartremover.warts.IterableOps"))
     def writeChunkRec(historyStore: KeyValueStore[F], dataStore: KeyValueStore[F])(
         p: Param
     ): F[Either[Param, Unit]] = {

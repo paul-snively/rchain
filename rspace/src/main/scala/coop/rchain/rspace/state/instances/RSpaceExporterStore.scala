@@ -1,7 +1,7 @@
 package coop.rchain.rspace.state.instances
 
+import cats._, cats.implicits._
 import cats.effect.Concurrent
-import cats.syntax.all._
 import coop.rchain.rspace.hashing.Blake2b256Hash
 import coop.rchain.rspace.history.RootsStoreInstances
 import coop.rchain.rspace.history.instances.RadixHistory
@@ -38,7 +38,11 @@ object RSpaceExporterStore {
     ): F[Vector[(Blake2b256Hash, Value)]] =
       for {
         loaded <- store.get(keys.map(_.bytes.toDirectByteBuffer), fromBuffer)
-      } yield keys.zip(loaded).filter(_._2.nonEmpty).map(_.map(_.get))
+        maybe = keys.zip(loaded).mapFilter {
+          case (k, opt) =>
+            opt.map(v => (k, v))
+        }
+      } yield maybe
 
     override def getHistoryItems[Value](
         keys: Vector[Blake2b256Hash],
@@ -65,7 +69,7 @@ object RSpaceExporterStore {
       val rootsStore = RootsStoreInstances.rootsStore(sourceRootsStore)
       for {
         maybeRoot <- rootsStore.currentRoot()
-        root      <- maybeRoot.liftTo(NoRootError)
+        root      <- maybeRoot.liftTo[F](NoRootError)
       } yield root
     }
   }
