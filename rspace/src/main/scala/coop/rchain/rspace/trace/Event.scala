@@ -15,7 +15,7 @@ import scala.collection.SortedSet
   *   1. [[IOEvent]]s, which are represented as [[Produce]] and [[Consume]]s
   *   2. [[COMM]] Events, which consist of a single [[Consume]] and one or more [[Produce]]s
   */
-sealed trait Event
+sealed trait Event extends Product with Serializable
 
 final case class COMM(
     consume: Consume,

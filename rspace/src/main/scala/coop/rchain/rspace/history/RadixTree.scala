@@ -1,8 +1,8 @@
 package coop.rchain.rspace.history
 
-import cats.Parallel
+import cats._, cats.implicits._
 import cats.effect.Sync
-import cats.syntax.all._
+
 import coop.rchain.rspace.hashing.Blake2b256Hash
 import coop.rchain.shared.syntax._
 import coop.rchain.store.KeyValueTypedStore
@@ -17,7 +17,7 @@ object RadixTree {
   /**
     * Described items which contain in [[Node]].
     */
-  sealed trait Item
+  sealed trait Item extends Product with Serializable
 
   /**
     * EmptyItem is item which not storing data
@@ -456,9 +456,9 @@ object RadixTree {
       val newPath        = newCurNodeData +: p.path.tail
       item match {
         case EmptyItem =>
-          StepData(newPath, p.skip, p.take, p.expData).pure
+          StepData(newPath, p.skip, p.take, p.expData).pure[F]
         case Leaf(leafPrefix, leafValue) =>
-          addLeaf(p, leafPrefix, leafValue, itemIndex, curNodePrefix, newPath).pure
+          addLeaf(p, leafPrefix, leafValue, itemIndex, curNodePrefix, newPath).pure[F]
         case NodePtr(ptrPrefix, ptr) =>
           addNodePtr(p, ptrPrefix, ptr, itemIndex, curNodePrefix, newPath)
       }
@@ -470,7 +470,7 @@ object RadixTree {
     def exportStep(p: StepData): F[Either[StepData, (ExportData, Option[KeySegment])]] =
       Sync[F].defer {
         if (p.path.isEmpty) // End of Tree
-          (p.expData, Option.empty[KeySegment]).asRight[StepData].pure
+          (p.expData, Option.empty[KeySegment]).asRight[StepData].pure[F]
         else {
           val curNodeData   = p.path.head
           val curNodePrefix = curNodeData.prefix
@@ -479,7 +479,7 @@ object RadixTree {
           if ((p.skip, p.take) == (0, 0))
             (p.expData, curNodePrefix.some)
               .asRight[StepData]
-              .pure // End of skip&take counter
+              .pure[F] // End of skip&take counter
           else {
             val nextNotEmptyItemOpt = findNextNonEmptyItem(curNode, curNodeData.lastItemIndex)
             val newStepDataF = nextNotEmptyItemOpt
@@ -487,7 +487,7 @@ object RadixTree {
                 case (itemIndex, item) =>
                   addElement(p, itemIndex, item, curNode, curNodePrefix)
               }
-              .getOrElse(StepData(p.path.tail, p.skip, p.take, p.expData).pure)
+              .getOrElse(StepData(p.path.tail, p.skip, p.take, p.expData).pure[F])
             newStepDataF.map(_.asLeft)
           }
         }
@@ -496,9 +496,9 @@ object RadixTree {
     def initConditionsException: F[Unit] =
       new RuntimeException(
         s"Export error: invalid initial conditions (skipSize, takeSize)==(0,0)."
-      ).raiseError
+      ).raiseError[F, Unit]
     def emptyExportData = ExportData(Vector(), Vector(), Vector(), Vector(), Vector())
-    def emptyResult     = (emptyExportData, none).pure
+    def emptyResult     = (emptyExportData, none).pure[F]
 
     def doExport(rootNodeSer: ByteVector) =
       for {
@@ -507,7 +507,7 @@ object RadixTree {
                        KeySegment.empty,
                        lastPrefix.getOrElse(KeySegment.empty),
                        Vector()
-                     ).pure
+                     ).pure[F]
         noRootStart  = (emptyExportData, skipSize, takeSize)     // Start from next node after lastPrefix
         skippedStart = (emptyExportData, skipSize - 1, takeSize) // Skipped node start
         rootExportData = {
@@ -587,6 +587,7 @@ object RadixTree {
       * If there is no such record in cache - load and decode from KVDB, then save to cacheR.
       * If there is no such record in KVDB - execute assert (if set noAssert flag - return emptyNode).
       */
+    @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
     def loadNode(nodePtr: Blake2b256Hash, noAssert: Boolean = false): F[Node] = {
       def errorMsg(): Unit =
         assert(noAssert, s"Missing node in database. ptr=${nodePtr.bytes.toHex}.")
@@ -597,7 +598,7 @@ object RadixTree {
         } yield storeNodeOpt.getOrElse(emptyNode)
       for {
         cacheNodeOpt <- Sync[F].delay(cacheR.get(nodePtr))
-        r            <- cacheNodeOpt.map(_.pure).getOrElse(cacheMiss)
+        r            <- cacheNodeOpt.map(_.pure[F]).getOrElse(cacheMiss)
       } yield r
     }
 
@@ -638,10 +639,11 @@ object RadixTree {
       * If detected collision with older KVDB data - execute Exception
       */
     def commit: F[Unit] = {
+      @SuppressWarnings(Array("org.wartremover.warts.IterableOps"))
       def collisionException(collisions: List[(Blake2b256Hash, ByteVector)]): F[Unit] =
         new RuntimeException(
           s"${collisions.length} collisions in KVDB (first collision with key = ${collisions.head._1.bytes.toHex})."
-        ).raiseError
+        ).raiseError[F, Unit]
       for {
         kvPairs           <- Sync[F].delay(cacheW.toList)
         ifAbsent          <- store.contains(kvPairs.map(_._1))
@@ -650,7 +652,7 @@ object RadixTree {
         valueExistInStore <- store.get(kvExist.map(_._1))
         kvvExist          = kvExist zip valueExistInStore.map(_.getOrElse(ByteVector.empty))
         kvCollision       = kvvExist.filter(kvv => !(kvv._1._2 == kvv._2)).map(_._1)
-        _                 <- if (kvCollision.nonEmpty) collisionException(kvCollision) else ().pure
+        _                 <- if (kvCollision.nonEmpty) collisionException(kvCollision) else ().pure[F]
         kvAbsent          = kvIfAbsent.filterNot(_._2).map(_._1)
         _                 <- store.put(kvAbsent)
       } yield ()
@@ -670,20 +672,20 @@ object RadixTree {
       def loop(params: Params): F[Either[Params, Option[Blake2b256Hash]]] =
         params match {
           case (_, KeySegment.empty) =>
-            Option.empty[Blake2b256Hash].asRight[Params].pure // Not found
+            Option.empty[Blake2b256Hash].asRight[Params].pure[F] // Not found
           case (curNode, prefix) =>
             curNode(byteToInt(prefix.head)) match {
-              case EmptyItem => Option.empty[Blake2b256Hash].asRight[Params].pure // Not found
+              case EmptyItem => Option.empty[Blake2b256Hash].asRight[Params].pure[F] // Not found
 
               case Leaf(leafPrefix, value) =>
-                if (leafPrefix == prefix.tail) value.some.asRight[Params].pure // Happy end
-                else Option.empty[Blake2b256Hash].asRight[Params].pure         // Not found
+                if (leafPrefix == prefix.tail) value.some.asRight[Params].pure[F] // Happy end
+                else Option.empty[Blake2b256Hash].asRight[Params].pure[F]         // Not found
 
               case NodePtr(ptrPrefix, ptr) =>
                 val (_, prefixRest, ptrPrefixRest) = commonPrefix(prefix.tail, ptrPrefix)
                 if (ptrPrefixRest.isEmpty)
-                  loadNode(ptr).map(n => (n, prefixRest).asLeft)       // Deeper
-                else Option.empty[Blake2b256Hash].asRight[Params].pure // Not found
+                  loadNode(ptr).map(n => (n, prefixRest).asLeft)          // Deeper
+                else Option.empty[Blake2b256Hash].asRight[Params].pure[F] // Not found
             }
         }
       (startNode, startPrefix).tailRecM(loop)
@@ -722,6 +724,7 @@ object RadixTree {
     /**
       * Optimize and save Node, create item from this Node
       */
+    @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
     private def saveNodeAndCreateItem(
         node: Node,
         prefix: KeySegment,
@@ -780,7 +783,7 @@ object RadixTree {
       Sync[F].defer {
         curItem match {
           case EmptyItem =>
-            (Leaf(insPrefix, insValue): Item).some.pure // Update EmptyItem to Leaf.
+            (Leaf(insPrefix, insValue): Item).some.pure[F] // Update EmptyItem to Leaf.
 
           case Leaf(leafPrefix, leafValue) =>
             assert(
@@ -788,8 +791,8 @@ object RadixTree {
               "The length of all prefixes in the subtree must be the same."
             )
             if (leafPrefix == insPrefix) {
-              if (insValue == leafValue) none[Item].pure
-              else (Leaf(insPrefix, insValue): Item).some.pure
+              if (insValue == leafValue) none[Item].pure[F]
+              else (Leaf(insPrefix, insValue): Item).some.pure[F]
             } // Update Leaf.
             else {
               // Create child node, insert existing and new leaf in this node.
@@ -798,7 +801,7 @@ object RadixTree {
               val newNode = emptyNode
                 .updated(byteToInt(leafPrefixRest.head), Leaf(leafPrefixRest.tail, leafValue))
                 .updated(byteToInt(insPrefixRest.head), Leaf(insPrefixRest.tail, insValue))
-              saveNodeAndCreateItem(newNode, commPrefix, compaction = false).some.pure
+              saveNodeAndCreateItem(newNode, commPrefix, compaction = false).some.pure[F]
             }
 
           case NodePtr(ptrPrefix, ptr) =>
@@ -811,7 +814,7 @@ object RadixTree {
               val newNode = emptyNode
                 .updated(byteToInt(ptrPrefixRest.head), NodePtr(ptrPrefixRest.tail, ptr))
                 .updated(byteToInt(insPrefixRest.head), Leaf(insPrefixRest.tail, insValue))
-              saveNodeAndCreateItem(newNode, commPrefix, compaction = false).some.pure
+              saveNodeAndCreateItem(newNode, commPrefix, compaction = false).some.pure[F]
             }
         }
       }
@@ -845,16 +848,16 @@ object RadixTree {
 
       Sync[F].defer {
         curItem match {
-          case EmptyItem => none[Item].pure // Not found
+          case EmptyItem => none[Item].pure[F] // Not found
 
           case Leaf(leafPrefix, _) =>
-            if (leafPrefix == delPrefix) (EmptyItem: Item).some.pure // Happy end
-            else none[Item].pure                                     // Not found
+            if (leafPrefix == delPrefix) (EmptyItem: Item).some.pure[F] // Happy end
+            else none[Item].pure[F]                                     // Not found
 
           case NodePtr(ptrPrefix, ptr) =>
             val (commPrefix, delPrefixRest, ptrPrefixRest) = commonPrefix(delPrefix, ptrPrefix)
-            if (ptrPrefixRest.nonEmpty || delPrefixRest.isEmpty) none[Item].pure // Not found
-            else deleteFromChildNode(ptr, commPrefix, delPrefixRest)             // Deeper
+            if (ptrPrefixRest.nonEmpty || delPrefixRest.isEmpty) none[Item].pure[F] // Not found
+            else deleteFromChildNode(ptr, commPrefix, delPrefixRest)                // Deeper
         }
       }
     }
@@ -907,11 +910,12 @@ object RadixTree {
       def processSeveralActions(actions: List[HistoryAction], item: Item, itemIdx: Int) =
         for {
           clearedActions <- Sync[F].delay(clearingDeleteActions(actions, item))
-          r <- if (clearedActions.isEmpty) (itemIdx, none[Item]).pure
+          r <- if (clearedActions.isEmpty) (itemIdx, none[Item]).pure[F]
               else processNonEmptyActions(clearedActions, item, itemIdx)
         } yield r
 
       // Process actions within each group.
+      @SuppressWarnings(Array("org.wartremover.warts.IterableOps"))
       def processGroupedActions(groupedActions: List[(Byte, List[HistoryAction])], curNode: Node) =
         groupedActions.map {
           case (groupIdx, actionsInGroup) =>
@@ -925,6 +929,7 @@ object RadixTree {
         }
 
       // Group the actions by the first byte of the prefix.
+      @SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
       def grouping(actions: List[HistoryAction]) =
         actions.groupBy { action =>
           val firstByteOpt = action.key.headOption
@@ -1020,11 +1025,11 @@ object RadixTree {
         for {
           indent <- Sync[F].delay(constructIdent(indentLevel))
           itemVectors <- node.zipWithIndex.traverse {
-                          case (EmptyItem, _) => Vector[String]().pure
+                          case (EmptyItem, _) => Vector[String]().pure[F]
                           case (Leaf(leafPrefix, value), idx) =>
                             val leafStr =
                               constructLeafStr(indent, idx, leafPrefix, value)
-                            Vector(leafStr).pure
+                            Vector(leafStr).pure[F]
                           case (NodePtr(ptrPrefix, ptr), idx) =>
                             for {
                               childNode    <- loadNode(ptr)
@@ -1045,7 +1050,7 @@ object RadixTree {
         strings     <- print(rootNode, 1)
         firstString = constructFirstStr(treeName)
         r           = firstString +: strings
-        _           <- if (noPrintFlag) ().pure else Sync[F].delay(printStrings(r))
+        _           <- if (noPrintFlag) ().pure[F] else Sync[F].delay(printStrings(r))
       } yield r
     }
   }

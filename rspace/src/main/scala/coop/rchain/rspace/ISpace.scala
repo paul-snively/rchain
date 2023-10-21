@@ -10,6 +10,7 @@ final case class Result[C, A](
     removedDatum: A,
     persistent: Boolean
 )
+@SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
 final case class ContResult[C, P, K](
     continuation: K,
     persistent: Boolean,

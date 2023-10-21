@@ -29,6 +29,7 @@ trait Tuplespace[F[_], C, P, A, K] {
     * @param continuation A continuation
     * @param persist Whether or not to attempt to persist the data
     */
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   def consume(
       channels: Seq[C],
       patterns: Seq[P],

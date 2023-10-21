@@ -2,7 +2,7 @@ package coop.rchain.rspace
 
 import coop.rchain.rspace.internal.{Datum, WaitingContinuation}
 
-sealed trait HotStoreAction
+sealed trait HotStoreAction extends Product with Serializable
 
 sealed trait InsertAction                                          extends HotStoreAction
 final case class InsertData[C, A](channel: C, data: Seq[Datum[A]]) extends InsertAction

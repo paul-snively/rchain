@@ -175,6 +175,7 @@ abstract class RSpaceOps[F[_]: Concurrent: ContextShift: Log: Metrics: Span, C, 
       case (channels, Install(patterns, continuation)) => install(channels, patterns, continuation)
     })
 
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   override def consume(
       channels: Seq[C],
       patterns: Seq[P],

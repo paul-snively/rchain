@@ -11,6 +11,8 @@ Global / cancelable := true
 //resolve all version conflicts explicitly
 // Global / dependencyOverrides := Dependencies.overrides
 
+Global / semanticdbEnabled := true
+
 ThisBuild / libraryDependencies += compilerPlugin("io.tryp" % "splain_2.12.15" % "0.5.8")
 
 val allowedWarts = Set(

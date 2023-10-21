@@ -37,6 +37,7 @@ final case class HotStoreState[C, P, A, K](
 )
 
 object HotStoreState {
+  @SuppressWarnings(Array("org.wartremover.warts.DefaultArguments"))
   def apply[C, P, A, K](
       continuations: Map[Seq[C], Seq[WaitingContinuation[P, K]]] =
         Map.empty[Seq[C], Seq[WaitingContinuation[P, K]]],
@@ -298,10 +299,8 @@ private class InMemHotStore[F[_]: Concurrent, C, P, A, K](
       }.toVector
     } yield continuations ++ data ++ joins
 
-  private def removeIndex[E](col: Seq[E], index: Int): Seq[E] = {
-    val (l1, l2) = col splitAt index
-    l1 ++ (l2 tail)
-  }
+  private def removeIndex[E](col: Seq[E], index: Int): Seq[E] =
+    col.slice(0, index) ++ col.slice(index + 1, col.length)
 
   def toMap: F[Map[Seq[C], Row[P, A, K]]] =
     for {

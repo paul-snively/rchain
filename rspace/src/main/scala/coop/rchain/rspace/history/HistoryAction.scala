@@ -2,7 +2,7 @@ package coop.rchain.rspace.history
 
 import coop.rchain.rspace.hashing.Blake2b256Hash
 
-sealed trait HistoryAction {
+sealed trait HistoryAction extends Product with Serializable {
   def key: KeySegment
 }
 
