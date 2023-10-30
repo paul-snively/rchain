@@ -83,15 +83,6 @@ lazy val projectSettings = Seq(
 // a namespace for generative tests (or other tests that take a long time)
 lazy val SlowcookerTest = config("slowcooker") extend (Test)
 
-lazy val coverageSettings = Seq(
-  coverageMinimum := 90,
-  coverageFailOnMinimum := false,
-  coverageExcludedFiles := Seq(
-    (Compile / javaSource).value,
-    (Compile / sourceManaged).value.getPath ++ "/.*"
-  ).mkString(";")
-)
-
 lazy val compilerSettings = CompilerSettings.options ++ Seq(
   crossScalaVersions := Seq(scalaVersion.value)
 )
@@ -106,7 +97,7 @@ lazy val profilerSettings = Seq(
   reStart / javaOptions ++= (run / javaOptions).value
 )
 
-lazy val commonSettings = projectSettings ++ coverageSettings ++ compilerSettings ++ profilerSettings
+lazy val commonSettings = projectSettings ++ compilerSettings ++ profilerSettings
 
 lazy val sdk = (project in file("sdk"))
   .settings(commonSettings: _*)
@@ -428,13 +419,6 @@ lazy val rholang = (project in file("rholang"))
     ),
     // TODO: investigate if still needed?
     // mainClass in assembly := Some("coop.rchain.rho2rose.Rholang2RosetteCompiler"),
-    coverageExcludedFiles := Seq(
-      (Compile / javaSource).value,
-      (BNFCConfig / bnfcGrammarDir).value,
-      (BNFCConfig / bnfcOutputDir).value,
-      baseDirectory.value / "src" / "main" / "k",
-      baseDirectory.value / "src" / "main" / "rbl"
-    ).map(_.getPath ++ "/.*").mkString(";"),
     //constrain the resource usage so that we hit SOE-s and OOME-s more quickly should they happen
     Test / javaOptions ++= Seq("-Xss240k", "-XX:MaxJavaStackTraceDepth=10000", "-Xmx128m")
   )
