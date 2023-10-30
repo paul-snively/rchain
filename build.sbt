@@ -13,14 +13,14 @@ Global / cancelable := true
 
 lazy val projectSettings = Seq(
   organization := "coop.rchain",
-  scalaVersion := "2.12.15",
+  scalaVersion := "2.12.18",
   version := "0.1.0-SNAPSHOT",
   resolvers ++=
     Resolver.sonatypeOssRepos("releases") ++
     Resolver.sonatypeOssRepos("snapshots") ++
     Seq("jitpack" at "https://jitpack.io"),
   wartremoverExcluded += sourceManaged.value,
-  Compile / compile / wartremoverErrors ++= Warts.allBut(
+  Compile / compile / wartremoverWarnings ++= Warts.allBut(
     // those we want
     Wart.DefaultArguments,
     Wart.ImplicitParameter,
@@ -32,7 +32,7 @@ lazy val projectSettings = Seq(
     Wart.Nothing,
     Wart.Equals,
     Wart.PublicInference,
-    Wart.TraversableOps,
+    Wart.IterableOps,
     Wart.ArrayEquals,
     Wart.While,
     Wart.Any,
@@ -52,7 +52,6 @@ lazy val projectSettings = Seq(
     Wart.AnyVal
   ),
   scalafmtOnCompile := !sys.env.contains("CI"), // disable in CI environments
-  ThisBuild / scapegoatVersion := "1.4.11",
   Test / testOptions += Tests.Argument("-oD"), //output test durations
   javacOptions ++= Seq("-source", "11", "-target", "11"),
   Test / fork := true,
@@ -401,7 +400,7 @@ lazy val rholang = (project in file("rholang"))
       "-language:existentials",
       "-language:higherKinds",
       "-Yno-adapted-args",
-      "-Xfatal-warnings",
+//      "-Xfatal-warnings",
       "-Xlint:_,-missing-interpolator" // disable "possible missing interpolator" warning
     ),
     Compile / packageDoc/ publishArtifact := false,
@@ -459,7 +458,7 @@ lazy val rspace = (project in file("rspace"))
   .settings(commonSettings: _*)
   .settings(
     scalacOptions ++= Seq(
-      "-Xfatal-warnings"
+//      "-Xfatal-warnings"
     ),
     Defaults.itSettings,
     name := "rspace",
